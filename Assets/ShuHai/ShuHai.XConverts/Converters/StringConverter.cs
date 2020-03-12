@@ -6,18 +6,22 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(String))]
     internal sealed class StringConverter : XConverter
     {
-        protected override void PopulateXElementImpl(XElement element, object obj, XConvertSettings settings)
+        protected sealed override void PopulateXElementValue(
+            XElement element, object @object, XConvertSettings settings)
         {
-            element.RemoveAll();
-            PopulateXAttributes(element, obj, settings);
-            element.Value = obj != null ? (string)obj : string.Empty;
+            element.Value = @object != null ? (string)@object : string.Empty;
+        }
+
+        protected sealed override void PopulateXElementChildren(
+            XElement element, object @object, XConvertSettings settings)
+        {
+            throw new NotSupportedException("Populate child elements of a string is not supported.");
         }
 
         protected override object ToObjectImpl(XElement element, XConvertSettings settings)
         {
-//            var type = ParseObjectTypeForObjectCreation(element);
-//            return type == null ? null : element.Value;
-            throw new NotImplementedException();
+            var type = ParseObjectType(element);
+            return type == null ? null : element.Value;
         }
     }
 }

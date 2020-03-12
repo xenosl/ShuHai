@@ -82,7 +82,10 @@ namespace ShuHai.XConverts
             if (!ReferenceEquals(@object, null))
             {
                 PopulateXElementValue(element, @object, settings);
-                PopulateXElementChildren(element, @object, settings);
+                
+                var type = @object.GetType();
+                if (!type.IsPrimitive)
+                    PopulateXElementChildren(element, @object, settings);
             }
         }
 
@@ -104,9 +107,6 @@ namespace ShuHai.XConverts
         protected virtual void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
             var type = @object.GetType();
-            if (type.IsPrimitive)
-                return;
-
             foreach (var field in EnumerateConvertibleFields(type))
             {
                 var value = field.GetValue(@object);
@@ -122,12 +122,15 @@ namespace ShuHai.XConverts
 
         #region XElement To Object
 
-        //public virtual bool CanConvert(XElement element) { return true; }
-
         public object ToObject(XElement element, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNull(element, nameof(element));
             return ToObjectImpl(element, settings ?? XConvertSettings.Default);
+        }
+
+        protected virtual object CreateObject(XElement element, Type type)
+        {
+            return Activator.CreateInstance(type);
         }
 
         protected virtual object ToObjectImpl(XElement element, XConvertSettings settings)
@@ -142,7 +145,7 @@ namespace ShuHai.XConverts
             if (!CanConvert(type))
                 throw new XmlException($"Can not convert specified xml element to '{type}' by {GetType()}.");
 
-            var @object = Activator.CreateInstance(type);
+            var @object = CreateObject(element, type);
             PopulateObjectMembersImpl(@object, element, settings);
             return @object;
         }
@@ -236,6 +239,9 @@ namespace ShuHai.XConverts
 
         #endregion Utilities
 
-        static XConverter() { InitializeBuiltIns(); }
+        static XConverter()
+        {
+            InitializeBuiltIns();
+        }
     }
 }
