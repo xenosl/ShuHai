@@ -1,0 +1,18 @@
+{
+    "name": "ShuHai.Unity.Extras",
+    "references": [
+        "GUID:2f3f35f1347586048b0a7c361332f826",
+        "GUID:7d5984d1468cda74bb5453d971ae947e",
+        "GUID:56f3711ea25024fa9954a79953c5d795",
+        "GUID:aea254639158a4993a8c7e444c4bd594"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:Template name="SHListView" path="Assets/ShuHai/ShuHai.Graphicode.Unity.Editor/UI/ListView.uxml" />
+    <ui:Instance template="SHListView" name="AssemblyList" style="height: 180px;"/>
+    <ui:Instance template="SHListView" name="TypeList" style="height: 180px;">
+        <Style path="Assets/ShuHai/ShuHai.Graphicode.Unity.Editor/CodeGeneratorWindow.uss" />
+    </ui:Instance>
+    <ui:Instance template="SHListView" name="MethodList" style="height: 180px;">
+        <Style path="Assets/ShuHai/ShuHai.Graphicode.Unity.Editor/CodeGeneratorWindow.uss" />
+    </ui:Instance>
+    <ui:Button text="Generate" name="Generate">
+        <Style path="Assets/ShuHai/ShuHai.Graphicode.Unity.Editor/CodeGeneratorWindow.uss" />
+    </ui:Button>
+</ui:UXML>

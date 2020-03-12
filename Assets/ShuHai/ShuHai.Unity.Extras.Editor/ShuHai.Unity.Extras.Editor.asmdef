@@ -1,0 +1,17 @@
+{
+    "name": "ShuHai.Unity.Extras.Editor",
+    "references": [
+        "GUID:574833ab0be1147f391d5162814fd623"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,16 @@
+{
+    "name": "ShuHai.SConverts.Unity",
+    "references": [
+        "ShuHai.Core",
+        "ShuHai.Unity",
+        "ShuHai.SConverts"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
