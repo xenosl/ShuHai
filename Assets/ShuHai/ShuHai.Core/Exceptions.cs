@@ -16,7 +16,9 @@ namespace ShuHai
         }
 
         public EnumOutOfRangeException(Enum @enum)
-            : this(@enum, string.Empty) { }
+            : this(@enum, string.Empty)
+        {
+        }
 
         public EnumOutOfRangeException(Enum @enum, string message)
             : base(message)
@@ -25,6 +27,13 @@ namespace ShuHai
         }
 
         public EnumOutOfRangeException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class MissingAttributeException : Exception
+    {
+        public MissingAttributeException() { }
+        public MissingAttributeException(string message) : base(message) { }
+        public MissingAttributeException(string message, Exception innerException) : base(message, innerException) { }
     }
 
     public class InvalidReferenceException : Exception
@@ -39,6 +48,5 @@ namespace ShuHai
         public InvalidConfigException() { }
         public InvalidConfigException(string message) : base(message) { }
         public InvalidConfigException(string message, Exception innerException) : base(message, innerException) { }
-
     }
 }

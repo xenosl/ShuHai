@@ -15,7 +15,7 @@ namespace ShuHai.XConverts.Converters
         protected sealed override void PopulateXElementChildren(
             XElement element, object @object, XConvertSettings settings)
         {
-            throw new NotSupportedException("Populate child elements of a string is not supported.");
+            // Nothing to do...
         }
 
         protected override object ToObjectImpl(XElement element, XConvertSettings settings)

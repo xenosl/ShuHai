@@ -11,6 +11,7 @@ namespace ShuHai.XConverts
     /// <summary>
     ///     Root converter for types of converter.
     /// </summary>
+    [XConvertType(typeof(object))]
     public class XConverter
     {
         public const string TypeAttributeName = "Type";
@@ -18,7 +19,14 @@ namespace ShuHai.XConverts
 
         public static readonly XConverter Default = new XConverter();
 
-        public virtual Type BaseConvertType { get; } = typeof(object);
+        protected XConverter() { BaseConvertType = GetBaseConvertType(); }
+
+        #region Convert Type
+
+        /// <summary>
+        ///     Base type of all types that can be converted by current converter.
+        /// </summary>
+        public Type BaseConvertType { get; }
 
         /// <summary>
         ///     Indicates the specified type of objects can be converted to a <see cref="XElement " /> or vice versa by current
@@ -28,6 +36,17 @@ namespace ShuHai.XConverts
         {
             return type.IsInstantiable() && BaseConvertType.IsAssignableFrom(type);
         }
+
+        private Type GetBaseConvertType()
+        {
+            var type = GetType();
+            var attr = type.GetCustomAttribute<XConvertTypeAttribute>();
+            if (attr == null)
+                throw new MissingAttributeException($"Missing {typeof(XConvertTypeAttribute).Name} for {type}.");
+            return attr.Type;
+        }
+
+        #endregion Convert Type
 
         #region Object To XElement
 
@@ -82,7 +101,7 @@ namespace ShuHai.XConverts
             if (!ReferenceEquals(@object, null))
             {
                 PopulateXElementValue(element, @object, settings);
-                
+
                 var type = @object.GetType();
                 if (!type.IsPrimitive)
                     PopulateXElementChildren(element, @object, settings);
@@ -128,10 +147,7 @@ namespace ShuHai.XConverts
             return ToObjectImpl(element, settings ?? XConvertSettings.Default);
         }
 
-        protected virtual object CreateObject(XElement element, Type type)
-        {
-            return Activator.CreateInstance(type);
-        }
+        protected virtual object CreateObject(XElement element, Type type) { return Activator.CreateInstance(type); }
 
         protected virtual object ToObjectImpl(XElement element, XConvertSettings settings)
         {
@@ -239,9 +255,6 @@ namespace ShuHai.XConverts
 
         #endregion Utilities
 
-        static XConverter()
-        {
-            InitializeBuiltIns();
-        }
+        static XConverter() { InitializeBuiltIns(); }
     }
 }
