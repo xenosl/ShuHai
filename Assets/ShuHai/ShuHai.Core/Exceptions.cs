@@ -15,10 +15,7 @@ namespace ShuHai
             }
         }
 
-        public EnumOutOfRangeException(Enum @enum)
-            : this(@enum, string.Empty)
-        {
-        }
+        public EnumOutOfRangeException(Enum @enum) : this(@enum, string.Empty) { }
 
         public EnumOutOfRangeException(Enum @enum, string message)
             : base(message)

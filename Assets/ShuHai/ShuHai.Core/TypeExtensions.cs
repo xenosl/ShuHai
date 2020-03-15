@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,14 +10,20 @@ namespace ShuHai
     public static class TypeExtensions
     {
         /// <summary>
-        ///     Get a value indicating how many hierarchies the specified type is derived from or parent to specified type.
+        ///     Get a value indicating how many hierarchy levels the specified type is derived or parented from specified type.
         /// </summary>
-        /// <param name="self"> From which the depth comes. </param>
-        /// <param name="type"> The type from which the depth is calculated. </param>
+        /// <param name="self">From which the depth comes.</param>
+        /// <param name="type">The type from which the depth is calculated.</param>
         /// <returns>
-        ///     A value indicating number of types in hierarchy between <paramref name="self" /> and <paramref name="type" /> if
-        ///     they have relationship of inheriting; otherwise -1.
+        ///     A value indicating number of types in hierarchy between <paramref name="self" /> and <paramref name="type" />
+        ///     if they have relationship of inheriting; otherwise, <see cref="ArgumentException" /> is thrown.
+        ///     A positive value means the specified <paramref name="type" /> is child of <see cref="self" />; otherwise,
+        ///     a negative value means the specified <paramref name="type" /> is parent of <see cref="self" />.
         /// </returns>
+        /// <remarks>
+        ///     There might be multiple inheriting path for interfaces, thus multiple hierarchy levels existed. The
+        ///     shortest path is chosen in such case.
+        /// </remarks>
         public static int GetDeriveDepth(this Type self, Type type = null)
         {
             Ensure.Argument.NotNull(self, nameof(self));
@@ -25,24 +32,40 @@ namespace ShuHai
 
             if (self == type)
                 return 0;
-            if (self.IsSubclassOf(type))
+            if (type.IsAssignableFrom(self))
                 return GetDerivedDepthImpl(self, type);
-            if (type.IsSubclassOf(self))
-                return GetDerivedDepthImpl(type, self);
-            return -1;
+            if (self.IsAssignableFrom(type))
+                return -GetDerivedDepthImpl(type, self);
+
+            throw new ArgumentException("Type is not in the hierarchy of current instance.", nameof(type));
         }
 
         private static int GetDerivedDepthImpl(Type derived, Type @base)
         {
-            var depth = 1;
-            var t = derived.BaseType;
-            while (t != @base && t != null)
+            if (@base.IsInterface)
             {
-                depth++;
-                t = t.BaseType;
+                int depth = 1;
+                var interfaces = derived.GetMostDerivedInterfaces();
+                while (!interfaces.Contains(@base))
+                {
+                    depth++;
+                    interfaces = interfaces.SelectMany(i => i.GetMostDerivedInterfaces()).Distinct().ToArray();
+                }
+                return depth;
             }
+            else
+            {
+                Debug.Assert(!derived.IsInterface);
 
-            return depth;
+                int depth = 1;
+                var t = derived.BaseType;
+                while (t != @base && t != null)
+                {
+                    depth++;
+                    t = t.BaseType;
+                }
+                return depth;
+            }
         }
 
         /// <summary>
@@ -58,8 +81,8 @@ namespace ShuHai
             Ensure.Argument.NotNull(self, nameof(self));
 
             var interfaces = self.GetInterfaces();
-            return interfaces.Where(i => !interfaces.Any(ii => i != ii && i.IsAssignableFrom(ii))).ToArray();
-            //return interfaces.Except(interfaces.SelectMany(t => t.GetInterfaces())).ToArray();
+            //return interfaces.Where(i => !interfaces.Any(ii => i != ii && i.IsAssignableFrom(ii))).ToArray();
+            return interfaces.Except(interfaces.SelectMany(t => t.GetInterfaces())).ToArray();
         }
 
         #region Member Getters

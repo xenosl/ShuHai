@@ -9,6 +9,33 @@ namespace ShuHai
     public class TypeExtensionsTests
     {
         [Test]
+        public void GetDeriveDepth()
+        {
+            GetDeriveDepth<object, object>(0);
+            GetDeriveDepth<int, object>(2);
+            GetDeriveDepth<object, int>(-2);
+
+            GetDeriveDepth<List<int>, object>(1);
+            GetDeriveDepth<object, List<int>>(-1);
+
+            GetDeriveDepth<List<int>, IReadOnlyList<int>>(1);
+            GetDeriveDepth<List<int>, IReadOnlyCollection<int>>(2);
+            GetDeriveDepth<List<int>, ICollection<int>>(2);
+            GetDeriveDepth<List<int>, IEnumerable<int>>(3);
+            GetDeriveDepth<List<int>, IEnumerable>(3);
+            GetDeriveDepth<IEnumerable, List<int>>(-3);
+
+            GetDeriveDepth<IList<int>, ICollection<int>>(1);
+            GetDeriveDepth<IList<int>, IEnumerable<int>>(2);
+            GetDeriveDepth<IList<int>, IEnumerable>(3);
+        }
+
+        private static void GetDeriveDepth<TSelf, TType>(int expected)
+        {
+            Assert.AreEqual(expected, typeof(TSelf).GetDeriveDepth(typeof(TType)));
+        }
+
+        [Test]
         public void GetMostDerivedInterfaces()
         {
             GetMostDerivedInterfaces(typeof(Dictionary<string, Type>),
@@ -18,13 +45,14 @@ namespace ShuHai
             GetMostDerivedInterfaces(typeof(IDictionary<string, Type>),
                 typeof(ICollection<KeyValuePair<string, Type>>));
 
-            GetMostDerivedInterfaces(typeof(ICollection<string>), typeof(IEnumerable<string>));
+            GetMostDerivedInterfaces(typeof(ICollection<int>), typeof(IEnumerable<int>));
+            GetMostDerivedInterfaces(typeof(IList<int>), typeof(ICollection<int>));
         }
 
-        private void GetMostDerivedInterfaces(Type type, params Type[] expect)
+        private static void GetMostDerivedInterfaces(Type type, params Type[] expected)
         {
             var actual = type.GetMostDerivedInterfaces();
-            CollectionAssert.AreEquivalent(expect, actual);
+            CollectionAssert.AreEquivalent(expected, actual);
         }
 
         #region Member Getters
