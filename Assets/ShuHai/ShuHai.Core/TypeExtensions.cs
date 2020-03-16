@@ -538,35 +538,30 @@ namespace ShuHai
         }
 
         /// <summary>
-        ///     Similar to <see cref="Type.IsSubclassOf(Type)" /> but also available on generic types.
+        ///     Determines whether instance of the current type is able to assign to instance of the constructed type of
+        ///     the specified generic type definition
         /// </summary>
-        /// <param name="self">Current type instance.</param>
-        /// <param name="type">The type to compare with the current type.</param>
-        /// <returns>
-        ///     <see langword="true" /> if the current Type derives from <paramref name="type" /> or its generic type definition;
-        ///     otherwise, <see langword="false" />. This method also returns <see langword="false" /> if <paramref name="type" />
-        ///     and the current Type are equal.
-        /// </returns>
-        public static bool IsBroadlySubclassOf(this Type self, Type type)
+        public static bool IsAssignableToConstructedGenericType(this Type self, Type genericDefinition)
         {
             Ensure.Argument.NotNull(self, nameof(self));
+            if (!genericDefinition.IsGenericTypeDefinition)
+                throw new ArgumentException("Generic type definition is required.", nameof(genericDefinition));
 
-            if (type == null || self == type)
+            if (self.IsGenericType && self.GetGenericTypeDefinition() == genericDefinition)
+                return true;
+
+            var interfaces = self.GetInterfaces();
+            foreach (var t in interfaces)
+            {
+                if (t.IsGenericType && t.GetGenericTypeDefinition() == genericDefinition)
+                    return true;
+            }
+
+            var @base = self.BaseType;
+            if (@base == null)
                 return false;
 
-            if (!type.IsGenericType && !self.IsGenericType)
-                return self.IsSubclassOf(type);
-
-            type = type.GetGenericTypeDefinition();
-            self = self.BaseType;
-            while (self != typeof(object) && self != null)
-            {
-                var t = self.IsGenericType ? self.GetGenericTypeDefinition() : self;
-                if (t == type)
-                    return true;
-                self = self.BaseType;
-            }
-            return false;
+            return IsAssignableToConstructedGenericType(@base, genericDefinition);
         }
 
         /// <summary>

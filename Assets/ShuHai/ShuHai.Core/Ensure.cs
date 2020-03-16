@@ -10,13 +10,13 @@ namespace ShuHai
         {
             public static void NotNull<T>(T arg, string name)
             {
-                if (arg == null)
+                if (ReferenceEquals(arg, null))
                     throw new ArgumentNullException(name);
             }
 
             public static void NotNull<T>(T arg, string name, string message)
             {
-                if (arg == null)
+                if (ReferenceEquals(arg, null))
                     throw new ArgumentNullException(name, message);
             }
 

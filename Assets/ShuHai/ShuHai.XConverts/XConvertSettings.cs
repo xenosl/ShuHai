@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters;
 
 namespace ShuHai.XConverts
@@ -16,47 +15,22 @@ namespace ShuHai.XConverts
 
         #region Converters
 
-        public ConverterCollection Converters = new ConverterCollection(XConverter.BuiltIns);
-
         /// <summary>
-        ///     Get appropriate <see cref="XConverter" /> for specified <see cref="Type" /> of object.
+        ///     Converters used during converts. <see cref="XConverter.BuiltIns" /> is used if the value is <see langword="null"/>.
         /// </summary>
-        /// <param name="targetType">Type of the object to convert.</param>
-        /// <returns>The most appropriate <see cref="XConverter" /> instance for object of type <paramref name="targetType" />.</returns>
-        public XConverter GetConverter(Type targetType)
+        public ConverterCollection Converters;
+
+        public XConverter FindAppropriateConverter(Type targetType)
         {
-            Ensure.Argument.NotNull(targetType, nameof(targetType));
+            return (Converters ?? XConverter.BuiltIns).FindAppropriateConverter(targetType);
+        }
 
-            if (targetType.IsInterface)
-                throw new NotSupportedException("Get converter for interfaces is not supported for now.");
-
-            if (targetType.IsPrimitive)
-                return XConverter.Default;
-
-            if (CollectionUtil.IsNullOrEmpty(Converters))
-                return null;
-
-            XConverter converter = null;
-            if (targetType.IsValueType)
-            {
-                converter = Converters[targetType];
-            }
-            else
-            {
-                var type = targetType;
-                while (type != null)
-                {
-                    converter = Converters[type];
-                    if (converter != null)
-                        break;
-                    type = type.BaseType;
-                }
-            }
-
-            if (converter == null)
-                converter = XConverter.BuiltIns[targetType];
-
-            return converter;
+        internal XConverter FindAppropriateConverter(object @object, Type fallbackType = null)
+        {
+            var converters = Converters ?? XConverter.BuiltIns;
+            if (@object == null)
+                return fallbackType != null ? converters.FindAppropriateConverter(fallbackType) : XConverter.Default;
+            return converters.FindAppropriateConverter(@object.GetType());
         }
 
         #endregion Converters

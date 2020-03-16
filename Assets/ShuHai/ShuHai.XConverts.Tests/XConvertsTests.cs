@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace ShuHai.XConverts
@@ -44,6 +45,19 @@ namespace ShuHai.XConverts
             ConvertTest(c, null);
             ConvertTest(c, string.Empty);
             ConvertTest(c, "This is a string.");
+        }
+
+        [Test]
+        public void CollectionConverterTest()
+        {
+            var c = XConverter.BuiltIns[typeof(ICollection<>)];
+            var c0 = new HashSet<string>();
+            var c1 = new List<object> { 978.44, Guid.NewGuid() };
+            var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, 5235.11 }, { 4, c1 } };
+
+            ConvertTest(c, c0);
+            ConvertTest(c, c1);
+            ConvertTest(c, c2);
         }
 
         private static void ConvertTest(XConverter converter, object value)

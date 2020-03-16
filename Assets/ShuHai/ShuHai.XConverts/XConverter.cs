@@ -19,25 +19,32 @@ namespace ShuHai.XConverts
 
         public static readonly XConverter Default = new XConverter();
 
-        protected XConverter() { BaseConvertType = GetBaseConvertType(); }
+        protected XConverter() { ConvertType = GetConvertType(); }
 
         #region Convert Type
 
         /// <summary>
         ///     Base type of all types that can be converted by current converter.
         /// </summary>
-        public Type BaseConvertType { get; }
+        public Type ConvertType { get; }
 
         /// <summary>
-        ///     Indicates the specified type of objects can be converted to a <see cref="XElement " /> or vice versa by current
-        ///     instance.
+        ///     Indicates the specified type of objects can be converted to a <see cref="XElement " /> or vice versa by
+        ///     current instance.
         /// </summary>
-        public virtual bool CanConvert(Type type)
+        public bool CanConvert(Type type) { return CanConvert(ConvertType, type); }
+
+        public static bool CanConvert(Type convertType, Type targetType)
         {
-            return type.IsInstantiable() && BaseConvertType.IsAssignableFrom(type);
+            if (!targetType.IsInstantiable())
+                return false;
+
+            return convertType.IsGenericTypeDefinition
+                ? targetType.IsAssignableToConstructedGenericType(convertType)
+                : convertType.IsAssignableFrom(targetType);
         }
 
-        private Type GetBaseConvertType()
+        private Type GetConvertType()
         {
             var type = GetType();
             var attr = type.GetCustomAttribute<XConvertTypeAttribute>();
@@ -55,8 +62,8 @@ namespace ShuHai.XConverts
         /// </summary>
         public virtual bool CanConvert(object @object)
         {
-            if (BaseConvertType.IsValueType)
-                return !ReferenceEquals(@object, null);
+            if (ConvertType.IsValueType)
+                return !ReferenceEquals(@object, null) && CanConvert(@object.GetType());
             return ReferenceEquals(@object, null) || CanConvert(@object.GetType());
         }
 
@@ -101,10 +108,7 @@ namespace ShuHai.XConverts
             if (!ReferenceEquals(@object, null))
             {
                 PopulateXElementValue(element, @object, settings);
-
-                var type = @object.GetType();
-                if (!type.IsPrimitive)
-                    PopulateXElementChildren(element, @object, settings);
+                PopulateXElementChildren(element, @object, settings);
             }
         }
 
@@ -116,12 +120,7 @@ namespace ShuHai.XConverts
             element.Add(new XAttribute(TypeAttributeName, typeName));
         }
 
-        protected virtual void PopulateXElementValue(XElement element, object @object, XConvertSettings settings)
-        {
-            var type = @object.GetType();
-            if (type.IsPrimitive)
-                element.Value = @object.ToString();
-        }
+        protected virtual void PopulateXElementValue(XElement element, object @object, XConvertSettings settings) { }
 
         protected virtual void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
@@ -129,9 +128,7 @@ namespace ShuHai.XConverts
             foreach (var field in EnumerateConvertibleFields(type))
             {
                 var value = field.GetValue(@object);
-                var converter = value != null
-                    ? settings.GetConverter(value.GetType())
-                    : settings.GetConverter(field.FieldType);
+                var converter = settings.FindAppropriateConverter(value, field.FieldType);
                 var fieldXElem = converter.ToXElement(value, field.Name, settings);
                 element.Add(fieldXElem);
             }
@@ -155,9 +152,6 @@ namespace ShuHai.XConverts
             if (type == null)
                 return null;
 
-            if (type.IsPrimitive)
-                return Convert.ChangeType(element.Value, type);
-
             if (!CanConvert(type))
                 throw new XmlException($"Can not convert specified xml element to '{type}' by {GetType()}.");
 
@@ -178,10 +172,6 @@ namespace ShuHai.XConverts
         public void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
             Ensure.Argument.NotNull(@object, nameof(@object));
-
-            if (@object.GetType().IsPrimitive)
-                throw new ArgumentException("Attempt to populate members of primitive type.", nameof(@object));
-
             PopulateObjectMembersImpl(@object, element, settings ?? XConvertSettings.Default);
         }
 
@@ -200,7 +190,7 @@ namespace ShuHai.XConverts
                 if (!field.FieldType.IsAssignableFrom(fieldType))
                     continue;
 
-                var converter = settings.GetConverter(fieldType);
+                var converter = settings.FindAppropriateConverter(fieldType);
                 field.SetValue(@object, converter.ToObject(childElement, settings));
             }
         }
@@ -210,21 +200,21 @@ namespace ShuHai.XConverts
         #region Built-in Instances
 
         /// <summary>
-        ///     The collection that contains all built-in <see cref="XConverter" /> instances.
+        ///     The collection that contains all default instances of all built-in <see cref="XConverter" />s.
         /// </summary>
-        public static IReadOnlyConverterCollection BuiltIns => builtIns;
+        public static readonly IReadOnlyConverterCollection BuiltIns;
 
-        private static readonly ConverterCollection builtIns = new ConverterCollection();
-
-        private static void InitializeBuiltIns()
+        private static IReadOnlyConverterCollection InitializeBuiltIns()
         {
             var rootType = typeof(XConverter);
             var converters = rootType.Assembly.GetTypes()
                 .Where(t => t != rootType && !t.IsAbstract && rootType.IsAssignableFrom(t))
                 .Select(Activator.CreateInstance)
                 .Cast<XConverter>();
-            builtIns.Add(Default);
+
+            var builtIns = new ConverterCollection { Default };
             builtIns.AddRange(converters);
+            return builtIns;
         }
 
         #endregion Built-in Instances
@@ -255,6 +245,6 @@ namespace ShuHai.XConverts
 
         #endregion Utilities
 
-        static XConverter() { InitializeBuiltIns(); }
+        static XConverter() { BuiltIns = InitializeBuiltIns(); }
     }
 }

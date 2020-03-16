@@ -11,14 +11,23 @@ namespace ShuHai.XConverts
             if (settings == null)
                 settings = XConvertSettings.Default;
 
-            var converter = settings.GetConverter(obj.GetType());
+            var converter = settings.FindAppropriateConverter(obj.GetType());
             return converter.ToXElement(obj, elementName, settings);
         }
 
         public static object ToObject(XElement element, XConvertSettings settings)
         {
             Ensure.Argument.NotNull(element, nameof(element));
-            return XConverter.Default.ToObject(element, settings);
+
+            if (settings == null)
+                settings = XConvertSettings.Default;
+
+            var type = XConverter.ParseObjectType(element);
+            if (type == null)
+                return null;
+
+            var converter = settings.FindAppropriateConverter(type);
+            return converter.ToObject(element, settings);
         }
     }
 }
