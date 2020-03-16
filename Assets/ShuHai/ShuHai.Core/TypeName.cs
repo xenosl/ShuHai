@@ -36,7 +36,7 @@ namespace ShuHai
         /// <summary>
         ///     Assembly-qualified name of the type, which includes <see cref="AssemblyName" /> if exists.
         /// </summary>
-        public readonly string AssemblyQualifiedName;
+        public string AssemblyQualifiedName { get; }
 
         /// <summary>
         ///     The name used to find the type in single assembly - without generic arguments or array symbols.
@@ -49,7 +49,7 @@ namespace ShuHai
         ///     Parent type name of current instance if current instance represents a generic argument type name of
         ///     certain generic type name.
         /// </summary>
-        public readonly TypeName GenericParent;
+        public TypeName GenericParent { get; }
 
         #region Construct
 
@@ -58,7 +58,7 @@ namespace ShuHai
             Ensure.Argument.NotNullOrEmpty(fullyQualifiedName, nameof(fullyQualifiedName));
 
             AssemblyQualifiedName = TrimName(fullyQualifiedName);
-            hashCode = AssemblyQualifiedName.GetHashCode();
+            _hashCode = AssemblyQualifiedName.GetHashCode();
 
             ParseFullNameAndAssemblyNameFromAssemblyQualifiedName();
 
@@ -138,9 +138,9 @@ namespace ShuHai
 
         public override bool Equals(object obj) { return Equals(obj as TypeName); }
 
-        public override int GetHashCode() { return hashCode; }
+        public override int GetHashCode() { return _hashCode; }
 
-        private readonly int hashCode;
+        private readonly int _hashCode;
 
         #endregion Equality
 
@@ -193,7 +193,7 @@ namespace ShuHai
             if (!IsArray)
                 return;
 
-            foreach (int rank in arrayRanks)
+            foreach (int rank in _arrayRanks)
             {
                 builder.Append('[');
                 for (var i = 1; i < rank; ++i)
@@ -238,14 +238,14 @@ namespace ShuHai
 
         #region Array
 
-        public bool IsArray => arrayRanks.Count > 0;
+        public bool IsArray => _arrayRanks.Count > 0;
 
-        public int ArrayDeclareCount => arrayRanks.Count;
+        public int ArrayDeclareCount => _arrayRanks.Count;
 
         /// <summary>
         ///     Number of dimensions for each array declaration if current instance is a jagged array.
         /// </summary>
-        public IEnumerable<int> ArrayRanks => arrayRanks;
+        public IEnumerable<int> ArrayRanks => _arrayRanks;
 
         /// <summary>
         ///     Get the number of dimensions array of current type instance.
@@ -254,9 +254,9 @@ namespace ShuHai
         ///     Index to locate which array declaration to get. The value greater than 0 is only valid if current instance is a
         ///     jagged array.
         /// </param>
-        public int GetArrayRank(int index = 0) { return arrayRanks[index]; }
+        public int GetArrayRank(int index = 0) { return _arrayRanks[index]; }
 
-        private readonly List<int> arrayRanks = new List<int>();
+        private readonly List<int> _arrayRanks = new List<int>();
 
         private bool ParseArrayRanksFromFullName(out int bracketStartIndex)
         {
@@ -276,7 +276,7 @@ namespace ShuHai
                         depth--;
                         if (depth == 0)
                         {
-                            arrayRanks.Add(rank);
+                            _arrayRanks.Add(rank);
                             rank = 1;
                         }
                         break;
@@ -295,7 +295,7 @@ namespace ShuHai
                 if (nonArrayChar)
                     break;
             }
-            arrayRanks.Reverse();
+            _arrayRanks.Reverse();
 
             return bracketStartIndex >= 0;
         }
@@ -306,13 +306,13 @@ namespace ShuHai
 
         public bool IsGeneric => GenericArgumentCount > 0;
 
-        public int GenericArgumentCount => genericArguments.Count;
+        public int GenericArgumentCount => _genericArguments.Count;
 
-        public IEnumerable<TypeName> GenericArguments => genericArguments;
+        public IEnumerable<TypeName> GenericArguments => _genericArguments;
 
-        public TypeName GetGenericArgument(int index) { return genericArguments[index]; }
+        public TypeName GetGenericArgument(int index) { return _genericArguments[index]; }
 
-        private readonly List<TypeName> genericArguments = new List<TypeName>();
+        private readonly List<TypeName> _genericArguments = new List<TypeName>();
 
         private void ParseGenericArguments(string argString)
         {
@@ -335,7 +335,7 @@ namespace ShuHai
             }
         }
 
-        private void AddGenericArgument(string argString) { genericArguments.Add(new TypeName(argString, this)); }
+        private void AddGenericArgument(string argString) { _genericArguments.Add(new TypeName(argString, this)); }
 
         #endregion Generic Arguments
 
@@ -359,7 +359,7 @@ namespace ShuHai
 
         private static readonly Dictionary<string, TypeName> instances = new Dictionary<string, TypeName>();
 
-        #endregion
+        #endregion Instances
 
         #region Utilities
 
@@ -435,6 +435,6 @@ namespace ShuHai
             return leftIndex >= 0 && rightIndex >= 0;
         }
 
-        #endregion Instances
+        #endregion Utilities
     }
 }

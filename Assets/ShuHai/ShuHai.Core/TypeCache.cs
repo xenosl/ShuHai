@@ -10,7 +10,7 @@ namespace ShuHai
 
     public sealed class TypeCache
     {
-        public readonly Type Type;
+        public Type Type { get; }
 
         private TypeCache(Type type)
         {
@@ -21,13 +21,8 @@ namespace ShuHai
 
         private void Clear()
         {
-            _derivedTypes = null;
-            _directDerivedTypes = null;
-            _interfaces = null;
-            _mostDerivedInterfaces = null;
-            _constructedTypes = null;
-
-            _methods = null;
+            ClearCachedTypes();
+            ClearCachedMembers();
         }
 
         #region Cached Types
@@ -52,8 +47,25 @@ namespace ShuHai
         /// <summary>
         ///     Most derived interfaces implemented or inherited by the current <see cref="Type" />.
         /// </summary>
-        public ITypeCollection MostDerivedInterfaces =>
-            _mostDerivedInterfaces ?? (_mostDerivedInterfaces = Type.GetMostDerivedInterfaces());
+        public ITypeCollection MostDerivedParentInterfaces =>
+            _mostDerivedParentInterfaces ?? (_mostDerivedParentInterfaces = Type.GetMostDerivedInterfaces());
+
+        /// <summary>
+        ///     Least derived child interfaces of the current interface <see cref="Type" />.
+        /// </summary>
+        public ITypeCollection LeastDerivedChildInterfaces
+        {
+            get
+            {
+                if (_leastDerivedChildInterfaces == null)
+                {
+                    _leastDerivedChildInterfaces = SearchAssemblies.SelectMany(a => a.GetTypes())
+                        .Where(t => t.IsInterface && t.GetMostDerivedInterfaces().Contains(Type))
+                        .ToList();
+                }
+                return _leastDerivedChildInterfaces;
+            }
+        }
 
         /// <summary>
         ///     All constructed types of this type. Only works if this type is a generic type definition.
@@ -64,8 +76,19 @@ namespace ShuHai
         private ITypeCollection _derivedTypes;
         private ITypeCollection _directDerivedTypes;
         private ITypeCollection _interfaces;
-        private ITypeCollection _mostDerivedInterfaces;
+        private ITypeCollection _mostDerivedParentInterfaces;
+        private ITypeCollection _leastDerivedChildInterfaces;
         private ITypeCollection _constructedTypes;
+
+        private void ClearCachedTypes()
+        {
+            _derivedTypes = null;
+            _directDerivedTypes = null;
+            _interfaces = null;
+            _mostDerivedParentInterfaces = null;
+            _leastDerivedChildInterfaces = null;
+            _constructedTypes = null;
+        }
 
         #endregion Cached Types
 
@@ -81,6 +104,8 @@ namespace ShuHai
                 .GroupBy(m => m.Name)
                 .ToDictionary(g => g.Key, g => (IReadOnlyList<MethodInfo>)g.ToArray());
         }
+
+        private void ClearCachedMembers() { _methods = null; }
 
         private const BindingFlags BindingAttrForAll = BindingFlags.DeclaredOnly |
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
