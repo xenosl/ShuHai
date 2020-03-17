@@ -2,9 +2,9 @@
 
 namespace ShuHai.XConverts
 {
-    public static class ReadOnlyConverterCollectionExtensions
+    public static class XConvertUtilities
     {
-        public static XConverter FindAppropriateConverter(this IReadOnlyConverterCollection self, Type type)
+        public static XConverter FindAppropriateConverter(IReadOnlyConverterCollection self, Type type)
         {
             Ensure.Argument.NotNull(type, nameof(type));
 
@@ -60,8 +60,8 @@ namespace ShuHai.XConverts
                 if (FindInInterfaces(collection, @interface, out converter))
                     return true;
             }
-            
-            converter = null;    
+
+            converter = null;
             return false;
         }
     }

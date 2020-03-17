@@ -22,15 +22,19 @@ namespace ShuHai.XConverts
 
         public XConverter FindAppropriateConverter(Type targetType)
         {
-            return (Converters ?? XConverter.BuiltIns).FindAppropriateConverter(targetType);
+            return XConvertUtilities.FindAppropriateConverter(Converters ?? XConverter.BuiltIns, targetType);
         }
 
         internal XConverter FindAppropriateConverter(object @object, Type fallbackType = null)
         {
             var converters = Converters ?? XConverter.BuiltIns;
             if (@object == null)
-                return fallbackType != null ? converters.FindAppropriateConverter(fallbackType) : XConverter.Default;
-            return converters.FindAppropriateConverter(@object.GetType());
+            {
+                return fallbackType != null
+                    ? XConvertUtilities.FindAppropriateConverter(converters, fallbackType)
+                    : XConverter.Default;
+            }
+            return XConvertUtilities.FindAppropriateConverter(converters, @object.GetType());
         }
 
         #endregion Converters
