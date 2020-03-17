@@ -1,0 +1,19 @@
+{
+    "name": "ShuHai.XConverts.Unity.Tests",
+    "references": [
+        "GUID:c282b176cb4a84205a266bf62359eff5",
+        "GUID:93904479aea658b46a753b93c592be82",
+        "GUID:3615cfc46f43d488a8d5318366b2ba18"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

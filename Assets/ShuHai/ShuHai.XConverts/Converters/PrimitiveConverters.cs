@@ -23,7 +23,10 @@ namespace ShuHai.XConverts.Converters
 
         #region XElement To Object
 
-        protected override object ToObjectImpl(XElement element, XConvertSettings settings) { return Parse(element.Value); }
+        protected override object ToObjectImpl(XElement element, XConvertSettings settings)
+        {
+            return Parse(element.Value);
+        }
 
         protected abstract object Parse(string value);
 
@@ -101,12 +104,14 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(float))]
     internal sealed class SingleConverter : PrimitiveConverter
     {
+        // TODO: Use BitConverter to ensure precision.
         protected override object Parse(string value) { return float.Parse(value); }
     }
 
     [XConvertType(typeof(double))]
     internal sealed class DoubleConverter : PrimitiveConverter
     {
+        // TODO: Use BitConverter to ensure precision.
         protected override object Parse(string value) { return double.Parse(value); }
     }
 

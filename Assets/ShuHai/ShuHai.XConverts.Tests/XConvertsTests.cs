@@ -69,7 +69,7 @@ namespace ShuHai.XConverts
             ConvertTest(c, Guid.NewGuid());
         }
 
-        private static void ConvertTest(XConverter converter, object value)
+        public static void ConvertTest(XConverter converter, object value)
         {
             var element = converter.ToXElement(value, "ConvertTest");
             var obj = converter.ToObject(element);
