@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -14,7 +15,14 @@ namespace ShuHai.XConverts
     [XConvertType(typeof(object))]
     public class XConverter
     {
+        /// <summary>
+        ///     Name of the attribute that sepcifies the type of an object.
+        /// </summary>
         public const string TypeAttributeName = "Type";
+
+        /// <summary>
+        ///     Attribute name for <see langword="null" /> type.
+        /// </summary>
         public const string NullTypeName = "$null";
 
         public static readonly XConverter Default = new XConverter();
@@ -114,10 +122,7 @@ namespace ShuHai.XConverts
 
         protected virtual void PopulateXAttributes(XElement element, object @object, XConvertSettings settings)
         {
-            var typeName = @object == null
-                ? NullTypeName
-                : TypeName.Get(@object.GetType()).ToString(settings.AssemblyNameStyle);
-            element.Add(new XAttribute(TypeAttributeName, typeName));
+            WriteObjectType(element, @object?.GetType(), settings.AssemblyNameStyle);
         }
 
         protected virtual void PopulateXElementValue(XElement element, object @object, XConvertSettings settings) { }
@@ -128,7 +133,7 @@ namespace ShuHai.XConverts
             foreach (var field in EnumerateConvertibleFields(type))
             {
                 var value = field.GetValue(@object);
-                var converter = settings.FindAppropriateConverter(value, field.FieldType);
+                var converter = XConvert.FindAppropriateConverter(settings.Converters, value, field.FieldType);
                 var fieldXElem = converter.ToXElement(value, field.Name, settings);
                 element.Add(fieldXElem);
             }
@@ -190,7 +195,7 @@ namespace ShuHai.XConverts
                 if (!field.FieldType.IsAssignableFrom(fieldType))
                     continue;
 
-                var converter = settings.FindAppropriateConverter(fieldType);
+                var converter = XConvert.FindAppropriateConverter(settings.Converters, fieldType);
                 field.SetValue(@object, converter.ToObject(childElement, settings));
             }
         }
@@ -220,6 +225,17 @@ namespace ShuHai.XConverts
         #endregion Built-in Instances
 
         #region Utilities
+
+        public static void WriteObjectType(XElement element, Type type,
+            FormatterAssemblyStyle? style = FormatterAssemblyStyle.Simple)
+        {
+            var typeName = type == null ? NullTypeName : TypeName.Get(type).ToString(style);
+            var attr = element.Attribute(TypeAttributeName);
+            if (attr == null)
+                element.Add(new XAttribute(TypeAttributeName, typeName));
+            else
+                attr.Value = typeName;
+        }
 
         public static Type ParseObjectType(XElement element)
         {

@@ -7,7 +7,7 @@ namespace ShuHai.XConverts
     public class XConvertsTests
     {
         [Test]
-        public void ObjectConverterTest()
+        public void ObjectConvert()
         {
             var c = XConverter.Default;
 
@@ -39,7 +39,7 @@ namespace ShuHai.XConverts
         }
 
         [Test]
-        public void StringConverterTest()
+        public void StringConvert()
         {
             var c = XConverter.BuiltIns[typeof(string)];
             ConvertTest(c, null);
@@ -48,7 +48,7 @@ namespace ShuHai.XConverts
         }
 
         [Test]
-        public void CollectionConverterTest()
+        public void CollectionConvert()
         {
             var c = XConverter.BuiltIns[typeof(ICollection<>)];
             var c0 = new HashSet<string>();
@@ -58,6 +58,15 @@ namespace ShuHai.XConverts
             ConvertTest(c, c0);
             ConvertTest(c, c1);
             ConvertTest(c, c2);
+        }
+
+        [Test]
+        public void GuidConvert()
+        {
+            var c = XConverter.BuiltIns[typeof(Guid)];
+            ConvertTest(c, Guid.Empty);
+            ConvertTest(c, Guid.NewGuid());
+            ConvertTest(c, Guid.NewGuid());
         }
 
         private static void ConvertTest(XConverter converter, object value)
