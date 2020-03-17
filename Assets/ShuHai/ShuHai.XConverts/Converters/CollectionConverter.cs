@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Xml.Linq;
 
 namespace ShuHai.XConverts.Converters
@@ -17,14 +16,11 @@ namespace ShuHai.XConverts.Converters
             var collection = (IEnumerable)@object;
             foreach (var item in collection)
             {
-                var converter = settings.FindAppropriateConverter(item, itemType);
+                var converter = XConvert.FindAppropriateConverter(settings.Converters, item, itemType);
                 var childElement = converter.ToXElement(item, "Item", settings);
                 element.Add(childElement);
             }
         }
-
-        private const BindingFlags BindingAttrForInterfaceMethod =
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         protected override void PopulateObjectMembersImpl(object @object, XElement element, XConvertSettings settings)
         {
@@ -36,22 +32,28 @@ namespace ShuHai.XConverts.Converters
                 object item = null;
                 if (itemType != null)
                 {
-                    var converter = settings.FindAppropriateConverter(itemType);
+                    var converter = XConvert.FindAppropriateConverter(settings.Converters, itemType);
                     item = converter.ToObject(childElement, settings);
                 }
                 addMethod.Invoke(@object, new[] { item });
             }
         }
 
-        private Type ItemTypeOf(object @object) { return ItemTypeOf(CollectionTypeOf(@object)); }
+        /// <summary>
+        ///     Get the actual item type of the specified collection object.
+        /// </summary>
+        protected Type ItemTypeOf(object @object) { return ItemTypeOf(CollectionTypeOf(@object)); }
 
-        private Type ItemTypeOf(Type collectionType)
+        protected Type ItemTypeOf(Type collectionType)
         {
             Debug.Assert(collectionType.IsClosedConstructedTypeOf(ConvertType));
             return collectionType.GetGenericArguments()[0];
         }
 
-        private Type CollectionTypeOf(object @object)
+        /// <summary>
+        ///     Get the constructed collection type of the specified collection object.
+        /// </summary>
+        protected Type CollectionTypeOf(object @object)
         {
             return @object.GetType().GetInterfaces()
                 .First(t => t.IsGenericType && t.GetGenericTypeDefinition() == ConvertType);
