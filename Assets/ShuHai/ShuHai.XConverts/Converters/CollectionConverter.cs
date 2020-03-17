@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -27,8 +28,8 @@ namespace ShuHai.XConverts.Converters
 
         protected override void PopulateObjectMembersImpl(object @object, XElement element, XConvertSettings settings)
         {
-            var type = @object.GetType();
-            var addMethod = type.GetMethod("Add", new[] { ItemTypeOf(@object) });
+            var type = CollectionTypeOf(@object);
+            var addMethod = type.GetMethod("Add", new[] { ItemTypeOf(type) });
             foreach (var childElement in element.Elements())
             {
                 var itemType = ParseObjectType(childElement);
@@ -42,7 +43,13 @@ namespace ShuHai.XConverts.Converters
             }
         }
 
-        private Type ItemTypeOf(object @object) { return CollectionTypeOf(@object).GetGenericArguments()[0]; }
+        private Type ItemTypeOf(object @object) { return ItemTypeOf(CollectionTypeOf(@object)); }
+
+        private Type ItemTypeOf(Type collectionType)
+        {
+            Debug.Assert(collectionType.IsClosedConstructedTypeOf(ConvertType));
+            return collectionType.GetGenericArguments()[0];
+        }
 
         private Type CollectionTypeOf(object @object)
         {
