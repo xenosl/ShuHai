@@ -3,32 +3,14 @@ using System.Xml.Linq;
 
 namespace ShuHai.XConverts.Converters
 {
-    public abstract class PrimitiveConverter : XConverter
+    public abstract class PrimitiveConverter : ValueConverter
     {
-        //public const string ValueStyleAttributeName = "ValueStyle";
-
-        #region Object To XElement
+//        public const string ValueStyleAttributeName = "ValueStyle";
 
 //        protected override void PopulateXAttributes(XElement element, object @object, XConvertSettings settings)
 //        {
 //            base.PopulateXAttributes(element, @object, settings);
 //        }
-
-        protected override void PopulateXElementValue(XElement element, object @object,
-            XConvertSettings settings)
-        {
-            element.Value = @object.ToString();
-        }
-
-        protected sealed override void PopulateXElementChildren(
-            XElement element, object @object, XConvertSettings settings)
-        {
-            // Nothing to do...
-        }
-
-        #endregion Object To XElement
-
-        #region XElement To Object
 
         protected override object ToObjectImpl(XElement element, XConvertSettings settings)
         {
@@ -36,14 +18,6 @@ namespace ShuHai.XConverts.Converters
         }
 
         protected abstract object Parse(string value, XConvertSettings settings);
-
-        protected sealed override void PopulateObjectMembersImpl(
-            object @object, XElement element, XConvertSettings settings)
-        {
-            // Nothing to do...
-        }
-
-        #endregion XElement To Object
 
         #region Value Converts
 
@@ -161,12 +135,12 @@ namespace ShuHai.XConverts.Converters
             return ToValue(text, style, float.Parse, BitConverter.ToSingle);
         }
 
-        public static Double ToDouble(string text, ValueStyle style)
+        public static double ToDouble(string text, ValueStyle style)
         {
             return ToValue(text, style, double.Parse, BitConverter.ToDouble);
         }
 
-        public static T ToValue<T>(string text, ValueStyle style,
+        private static T ToValue<T>(string text, ValueStyle style,
             Func<string, T> textParser, Func<byte[], int, T> byteParser)
         {
             switch (style)
@@ -250,64 +224,28 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(float))]
     internal sealed class SingleConverter : PrimitiveConverter
     {
-        protected override void PopulateXElementValue(XElement element, object @object, XConvertSettings settings)
+        protected override string ValueToString(object value, XConvertSettings settings)
         {
-            switch (settings.FloatingPointStyle)
-            {
-                case ValueStyle.Text:
-                    element.Value = @object.ToString();
-                    break;
-                case ValueStyle.Byte:
-                    element.Value = BitConverterEx.ToString((float)@object);
-                    break;
-                default:
-                    throw new EnumOutOfRangeException(settings.FloatingPointStyle);
-            }
+            return ToString((float)value, settings.FloatingPointStyle);
         }
 
         protected override object Parse(string value, XConvertSettings settings)
         {
-            switch (settings.FloatingPointStyle)
-            {
-                case ValueStyle.Text:
-                    return float.Parse(value);
-                case ValueStyle.Byte:
-                    return BitConverter.ToSingle(BitConverterEx.FromString(value), 0);
-                default:
-                    throw new EnumOutOfRangeException(settings.FloatingPointStyle);
-            }
+            return ToSingle(value, settings.FloatingPointStyle);
         }
     }
 
     [XConvertType(typeof(double))]
     internal sealed class DoubleConverter : PrimitiveConverter
     {
-        protected override void PopulateXElementValue(XElement element, object @object, XConvertSettings settings)
+        protected override string ValueToString(object value, XConvertSettings settings)
         {
-            switch (settings.FloatingPointStyle)
-            {
-                case ValueStyle.Text:
-                    element.Value = @object.ToString();
-                    break;
-                case ValueStyle.Byte:
-                    element.Value = BitConverterEx.ToString((double)@object);
-                    break;
-                default:
-                    throw new EnumOutOfRangeException(settings.FloatingPointStyle);
-            }
+            return ToString((double)value, settings.FloatingPointStyle);
         }
 
         protected override object Parse(string value, XConvertSettings settings)
         {
-            switch (settings.FloatingPointStyle)
-            {
-                case ValueStyle.Text:
-                    return double.Parse(value);
-                case ValueStyle.Byte:
-                    return BitConverter.ToDouble(BitConverterEx.FromString(value), 0);
-                default:
-                    throw new EnumOutOfRangeException(settings.FloatingPointStyle);
-            }
+            return ToDouble(value, settings.FloatingPointStyle);
         }
     }
 

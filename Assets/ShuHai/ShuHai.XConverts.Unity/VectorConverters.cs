@@ -1,49 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
 using ShuHai.XConverts.Converters;
 using UnityEngine;
 
 namespace ShuHai.XConverts.Unity
 {
-    public abstract class VectorConverter : XConverter
-    {
-        protected sealed override void PopulateXElementChildren(
-            XElement element, object @object, XConvertSettings settings)
-        {
-            // Nothing to do...
-        }
-
-        protected sealed override void PopulateObjectMembersImpl(
-            object @object, XElement element, XConvertSettings settings)
-        {
-            // Nothing to do...
-        }
-
-        protected static string MergeValues(IEnumerable<float> values, ValueStyle style)
-        {
-            return string.Join(",", values.Select(v => PrimitiveConverter.ToString(v, style)));
-        }
-
-        protected static float[] SplitValues(string value, ValueStyle style)
-        {
-            return value.Split(',').Select(v => PrimitiveConverter.ToSingle(v, style)).ToArray();
-        }
-
-        private static XConverter ValueConverter => _valueConverter.Value;
-
-        private static readonly Lazy<XConverter>
-            _valueConverter = new Lazy<XConverter>(() => BuiltIns[typeof(float)]);
-    }
-
     [XConvertType(typeof(Vector2))]
-    public class Vector2Converter : VectorConverter
+    public class Vector2Converter : ValueConverter
     {
-        protected override void PopulateXElementValue(XElement element, object @object, XConvertSettings settings)
+        protected override string ValueToString(object value, XConvertSettings settings)
         {
-            var value = (Vector2)@object;
-            element.Value = MergeValues(new[] { value.x, value.y }, settings.FloatingPointStyle);
+            var vec = (Vector2)value;
+            return MergeValues(new[] { vec.x, vec.y }, settings.FloatingPointStyle);
         }
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
@@ -54,12 +22,12 @@ namespace ShuHai.XConverts.Unity
     }
 
     [XConvertType(typeof(Vector3))]
-    public class Vector3Converter : VectorConverter
+    public class Vector3Converter : ValueConverter
     {
-        protected override void PopulateXElementValue(XElement element, object @object, XConvertSettings settings)
+        protected override string ValueToString(object value, XConvertSettings settings)
         {
-            var value = (Vector3)@object;
-            element.Value = MergeValues(new[] { value.x, value.y, value.z }, settings.FloatingPointStyle);
+            var vec = (Vector3)value;
+            return MergeValues(new[] { vec.x, vec.y, vec.z }, settings.FloatingPointStyle);
         }
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
@@ -70,12 +38,12 @@ namespace ShuHai.XConverts.Unity
     }
 
     [XConvertType(typeof(Vector4))]
-    public class Vector4Converter : VectorConverter
+    public class Vector4Converter : ValueConverter
     {
-        protected override void PopulateXElementValue(XElement element, object @object, XConvertSettings settings)
+        protected override string ValueToString(object value, XConvertSettings settings)
         {
-            var value = (Vector4)@object;
-            element.Value = MergeValues(new[] { value.x, value.y, value.z, value.w }, settings.FloatingPointStyle);
+            var vec = (Vector4)value;
+            return MergeValues(new[] { vec.x, vec.y, vec.z, vec.w }, settings.FloatingPointStyle);
         }
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
