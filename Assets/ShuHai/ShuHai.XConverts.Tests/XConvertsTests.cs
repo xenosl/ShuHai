@@ -34,8 +34,10 @@ namespace ShuHai.XConverts
             ConvertTest(c, -22.001f);
             ConvertTest(c, float.NaN);
             ConvertTest(c, float.Epsilon);
-            //ConvertTest(c, float.MinValue);
-            //ConvertTest(c, float.MaxValue);
+
+            var bytesForFp = new XConvertSettings { FloatingPointStyle = ValueStyle.Byte };
+            ConvertTest(c, float.MinValue, bytesForFp);
+            ConvertTest(c, float.MaxValue, bytesForFp);
         }
 
         [Test]
@@ -51,13 +53,15 @@ namespace ShuHai.XConverts
         public void CollectionConvert()
         {
             var c = XConverter.BuiltIns[typeof(ICollection<>)];
+            var bytesForFp = new XConvertSettings { FloatingPointStyle = ValueStyle.Byte };
+            
             var c0 = new HashSet<string>();
             var c1 = new List<object> { 978.44, Guid.NewGuid() };
-            var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, 5235.11 }, { 4, c1 } };
-
+            var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, float.MaxValue }, { 4, c1 } };
+            
             ConvertTest(c, c0);
             ConvertTest(c, c1);
-            ConvertTest(c, c2);
+            ConvertTest(c, c2, bytesForFp);
         }
 
         [Test]
@@ -69,10 +73,13 @@ namespace ShuHai.XConverts
             ConvertTest(c, Guid.NewGuid());
         }
 
-        public static void ConvertTest(XConverter converter, object value)
+        public static void ConvertTest(XConverter converter, object value, XConvertSettings settings = null)
         {
-            var element = converter.ToXElement(value, "ConvertTest");
-            var obj = converter.ToObject(element);
+            if (settings == null)
+                settings = XConvertSettings.Default;
+
+            var element = converter.ToXElement(value, "ConvertTest", settings);
+            var obj = converter.ToObject(element, settings);
             Assert.AreEqual(value, obj);
         }
     }

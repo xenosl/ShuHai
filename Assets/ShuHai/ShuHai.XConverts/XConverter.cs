@@ -149,7 +149,10 @@ namespace ShuHai.XConverts
             return ToObjectImpl(element, settings ?? XConvertSettings.Default);
         }
 
-        protected virtual object CreateObject(XElement element, Type type) { return Activator.CreateInstance(type); }
+        protected virtual object CreateObject(XElement element, Type type, XConvertSettings settings)
+        {
+            return Activator.CreateInstance(type);
+        }
 
         protected virtual object ToObjectImpl(XElement element, XConvertSettings settings)
         {
@@ -160,7 +163,7 @@ namespace ShuHai.XConverts
             if (!CanConvert(type))
                 throw new XmlException($"Can not convert specified xml element to '{type}' by {GetType()}.");
 
-            var @object = CreateObject(element, type);
+            var @object = CreateObject(element, type, settings);
             PopulateObjectMembersImpl(@object, element, settings);
             return @object;
         }

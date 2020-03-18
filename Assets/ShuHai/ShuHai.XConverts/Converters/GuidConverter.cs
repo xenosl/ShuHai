@@ -17,7 +17,10 @@ namespace ShuHai.XConverts.Converters
             // Nothing to do...
         }
 
-        protected override object CreateObject(XElement element, Type type) { return Guid.Parse(element.Value); }
+        protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
+        {
+            return Guid.Parse(element.Value);
+        }
 
         protected override void PopulateObjectMembersImpl(object @object, XElement element, XConvertSettings settings)
         {
