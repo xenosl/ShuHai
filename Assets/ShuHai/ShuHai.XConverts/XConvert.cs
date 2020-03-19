@@ -1,5 +1,6 @@
 using System;
 using System.Xml.Linq;
+using ShuHai.XConverts.Converters;
 
 namespace ShuHai.XConverts
 {
@@ -50,58 +51,9 @@ namespace ShuHai.XConverts
             if (CollectionUtil.IsNullOrEmpty(converters))
                 converters = XConverter.BuiltIns;
 
-            if (FindInType(converters, type, out var converter))
-                return converter;
-            if (FindInInterfaces(converters, type, out converter))
-                return converter;
-            if (FindInBaseTypes(converters, type, out converter))
+            if (XConvertSelector.TrySelect(converters, type, out var converter))
                 return converter;
             return null;
-
-//            return self.Where(c => c.CanConvert(type)) // All available converters
-//                .OrderByDescending(c => type.GetDeriveDepth(c.ConvertType))
-//                .FirstOrDefault();
-        }
-
-        private static bool FindInType(IReadOnlyConverterCollection converters, Type type, out XConverter converter)
-        {
-            return type.IsGenericType
-                ? converters.TryGet(type.GetGenericTypeDefinition(), out converter)
-                : converters.TryGet(type, out converter);
-        }
-
-        private static bool FindInBaseTypes(
-            IReadOnlyConverterCollection converters, Type type, out XConverter converter)
-        {
-            var p = type.BaseType;
-            while (p != null)
-            {
-                if (FindInType(converters, p, out converter))
-                    return true;
-                p = p.BaseType;
-            }
-            converter = null;
-            return false;
-        }
-
-        private static bool FindInInterfaces(
-            IReadOnlyConverterCollection converters, Type type, out XConverter converter)
-        {
-            var interfaces = type.GetMostDerivedInterfaces();
-            foreach (var @interface in interfaces)
-            {
-                if (FindInType(converters, @interface, out converter))
-                    return true;
-            }
-
-            foreach (var @interface in interfaces)
-            {
-                if (FindInInterfaces(converters, @interface, out converter))
-                    return true;
-            }
-
-            converter = null;
-            return false;
         }
 
         internal static XConverter FindAppropriateConverter(
