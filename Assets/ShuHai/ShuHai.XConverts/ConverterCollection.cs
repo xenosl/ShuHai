@@ -6,10 +6,8 @@ namespace ShuHai.XConverts
 {
     using DictItem = KeyValuePair<Type, XConverter>;
 
-    public interface IReadOnlyConverterCollection : IReadOnlyCollection<XConverter>
+    public interface IReadOnlyConverterCollection : IReadOnlyDictionary<Type, XConverter>
     {
-        XConverter this[Type convertType] { get; }
-
         bool TryGet(Type convertType, out XConverter converter);
 
         bool Contains(XConverter converter);
@@ -73,9 +71,22 @@ namespace ShuHai.XConverts
         #region Explicit Implementations
 
         bool ICollection<XConverter>.IsReadOnly => false;
+
+        IEnumerable<Type> IReadOnlyDictionary<Type, XConverter>.Keys => _dict.Keys;
+        IEnumerable<XConverter> IReadOnlyDictionary<Type, XConverter>.Values => _dict.Values;
+
+        bool IReadOnlyDictionary<Type, XConverter>.ContainsKey(Type key) { return ContainsConvertType(key); }
+
+        bool IReadOnlyDictionary<Type, XConverter>.TryGetValue(Type key, out XConverter value)
+        {
+            return TryGet(key, out value);
+        }
+
         void ICollection<XConverter>.CopyTo(XConverter[] array, int arrayIndex) { throw new NotSupportedException(); }
 
         IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+
+        IEnumerator<DictItem> IEnumerable<DictItem>.GetEnumerator() { return _dict.GetEnumerator(); }
 
         #endregion Explicit Implementations
     }
