@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace ShuHai.XConverts.Converters
 {
@@ -36,19 +34,5 @@ namespace ShuHai.XConverts.Converters
         }
 
         #endregion XElement To Value
-
-        #region Utilities
-
-        protected static string MergeValues(IEnumerable<float> values, ValueStyle style)
-        {
-            return string.Join(",", values.Select(v => PrimitiveConverter.ToString(v, style)));
-        }
-
-        protected static float[] SplitValues(string value, ValueStyle style)
-        {
-            return value.Split(',').Select(v => PrimitiveConverter.ToSingle(v, style)).ToArray();
-        }
-
-        #endregion Utilities
     }
 }

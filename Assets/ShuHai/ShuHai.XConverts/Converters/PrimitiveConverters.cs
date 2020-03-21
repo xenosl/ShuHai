@@ -3,6 +3,8 @@ using System.Xml.Linq;
 
 namespace ShuHai.XConverts.Converters
 {
+    public enum ValueStyle { Text, Byte }
+
     public abstract class PrimitiveConverter : ValueConverter
     {
 //        public const string ValueStyleAttributeName = "ValueStyle";
@@ -11,6 +13,12 @@ namespace ShuHai.XConverts.Converters
 //        {
 //            base.PopulateXAttributes(element, @object, settings);
 //        }
+
+        public ValueStyle ValueStyle { get; set; }
+
+        protected PrimitiveConverter() { }
+
+        protected PrimitiveConverter(ValueStyle valueStyle) { ValueStyle = valueStyle; }
 
         protected override object ToObjectImpl(XElement element, XConvertSettings settings)
         {
@@ -160,98 +168,129 @@ namespace ShuHai.XConverts.Converters
     }
 
     [XConvertType(typeof(bool))]
-    internal sealed class BooleanConverter : PrimitiveConverter
+    public sealed class BooleanConverter : PrimitiveConverter
     {
+        public BooleanConverter() { }
+        public BooleanConverter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return bool.Parse(value); }
     }
 
     [XConvertType(typeof(char))]
-    internal sealed class CharConverter : PrimitiveConverter
+    public sealed class CharConverter : PrimitiveConverter
     {
+        public CharConverter() { }
+        public CharConverter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return char.Parse(value); }
     }
 
     [XConvertType(typeof(byte))]
-    internal sealed class ByteConverter : PrimitiveConverter
+    public sealed class ByteConverter : PrimitiveConverter
     {
-        public static readonly ByteConverter Instance = new ByteConverter();
+        public ByteConverter() { }
+        public ByteConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
         protected override object Parse(string value, XConvertSettings settings) { return byte.Parse(value); }
     }
 
     [XConvertType(typeof(sbyte))]
-    internal sealed class SByteConverter : PrimitiveConverter
+    public sealed class SByteConverter : PrimitiveConverter
     {
+        public SByteConverter() { }
+        public SByteConverter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return sbyte.Parse(value); }
     }
 
     [XConvertType(typeof(short))]
-    internal sealed class Int16Converter : PrimitiveConverter
+    public sealed class Int16Converter : PrimitiveConverter
     {
+        public Int16Converter() { }
+        public Int16Converter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return short.Parse(value); }
     }
 
     [XConvertType(typeof(ushort))]
-    internal sealed class UInt16Converter : PrimitiveConverter
+    public sealed class UInt16Converter : PrimitiveConverter
     {
+        public UInt16Converter() { }
+        public UInt16Converter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return ushort.Parse(value); }
     }
 
     [XConvertType(typeof(int))]
-    internal sealed class Int32Converter : PrimitiveConverter
+    public sealed class Int32Converter : PrimitiveConverter
     {
+        public Int32Converter() { }
+        public Int32Converter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return int.Parse(value); }
     }
 
     [XConvertType(typeof(uint))]
-    internal sealed class UInt32Converter : PrimitiveConverter
+    public sealed class UInt32Converter : PrimitiveConverter
     {
+        public UInt32Converter() { }
+        public UInt32Converter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return uint.Parse(value); }
     }
 
     [XConvertType(typeof(long))]
-    internal sealed class Int64Converter : PrimitiveConverter
+    public sealed class Int64Converter : PrimitiveConverter
     {
+        public Int64Converter() { }
+        public Int64Converter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return long.Parse(value); }
     }
 
     [XConvertType(typeof(ulong))]
-    internal sealed class UInt64Converter : PrimitiveConverter
+    public sealed class UInt64Converter : PrimitiveConverter
     {
+        public UInt64Converter() { }
+        public UInt64Converter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings) { return ulong.Parse(value); }
     }
 
     [XConvertType(typeof(float))]
-    internal sealed class SingleConverter : PrimitiveConverter
+    public sealed class SingleConverter : PrimitiveConverter
     {
+        public SingleConverter() { }
+        public SingleConverter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override string ValueToString(object value, XConvertSettings settings)
         {
-            return ToString((float)value, settings.FloatingPointStyle);
+            return ToString((float)value, ValueStyle);
         }
 
-        protected override object Parse(string value, XConvertSettings settings)
-        {
-            return ToSingle(value, settings.FloatingPointStyle);
-        }
+        protected override object Parse(string value, XConvertSettings settings) { return ToSingle(value, ValueStyle); }
     }
 
     [XConvertType(typeof(double))]
-    internal sealed class DoubleConverter : PrimitiveConverter
+    public sealed class DoubleConverter : PrimitiveConverter
     {
+        public DoubleConverter() { }
+        public DoubleConverter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override string ValueToString(object value, XConvertSettings settings)
         {
-            return ToString((double)value, settings.FloatingPointStyle);
+            return ToString((double)value, ValueStyle);
         }
 
-        protected override object Parse(string value, XConvertSettings settings)
-        {
-            return ToDouble(value, settings.FloatingPointStyle);
-        }
+        protected override object Parse(string value, XConvertSettings settings) { return ToDouble(value, ValueStyle); }
     }
 
     [XConvertType(typeof(IntPtr))]
-    internal sealed class IntPtrConverter : PrimitiveConverter
+    public sealed class IntPtrConverter : PrimitiveConverter
     {
+        public IntPtrConverter() { }
+        public IntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings)
         {
             return IntPtr.Size == 4 ? (IntPtr)int.Parse(value) : (IntPtr)long.Parse(value);
@@ -259,8 +298,11 @@ namespace ShuHai.XConverts.Converters
     }
 
     [XConvertType(typeof(UIntPtr))]
-    internal sealed class UIntPtrConverter : PrimitiveConverter
+    public sealed class UIntPtrConverter : PrimitiveConverter
     {
+        public UIntPtrConverter() { }
+        public UIntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
+
         protected override object Parse(string value, XConvertSettings settings)
         {
             return UIntPtr.Size == 4 ? (UIntPtr)uint.Parse(value) : (UIntPtr)ulong.Parse(value);

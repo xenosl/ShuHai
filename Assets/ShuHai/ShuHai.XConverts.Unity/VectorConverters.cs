@@ -11,12 +11,12 @@ namespace ShuHai.XConverts.Unity
         protected override string ValueToString(object value, XConvertSettings settings)
         {
             var vec = (Vector2)value;
-            return MergeValues(new[] { vec.x, vec.y }, settings.FloatingPointStyle);
+            return Utilities.MergeValues(new[] { vec.x, vec.y });
         }
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = SplitValues(element.Value, settings.FloatingPointStyle);
+            var v = Utilities.SplitValues(element.Value);
             return new Vector2(v[0], v[1]);
         }
     }
@@ -27,12 +27,12 @@ namespace ShuHai.XConverts.Unity
         protected override string ValueToString(object value, XConvertSettings settings)
         {
             var vec = (Vector3)value;
-            return MergeValues(new[] { vec.x, vec.y, vec.z }, settings.FloatingPointStyle);
+            return Utilities.MergeValues(new[] { vec.x, vec.y, vec.z });
         }
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = SplitValues(element.Value, settings.FloatingPointStyle);
+            var v = Utilities.SplitValues(element.Value);
             return new Vector3(v[0], v[1], v[2]);
         }
     }
@@ -43,12 +43,12 @@ namespace ShuHai.XConverts.Unity
         protected override string ValueToString(object value, XConvertSettings settings)
         {
             var vec = (Vector4)value;
-            return MergeValues(new[] { vec.x, vec.y, vec.z, vec.w }, settings.FloatingPointStyle);
+            return Utilities.MergeValues(new[] { vec.x, vec.y, vec.z, vec.w });
         }
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = SplitValues(element.Value, settings.FloatingPointStyle);
+            var v = Utilities.SplitValues(element.Value);
             return new Vector4(v[0], v[1], v[2], v[3]);
         }
     }

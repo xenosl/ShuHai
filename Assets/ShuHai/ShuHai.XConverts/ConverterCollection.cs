@@ -32,11 +32,17 @@ namespace ShuHai.XConverts
 
         public ConverterCollection(IEnumerable<XConverter> converters) { this.AddRange(converters); }
 
-        public void Add(XConverter converter)
+        public void Add(XConverter converter, bool replaceExisted)
         {
             Ensure.Argument.NotNull(converter, nameof(converter));
-            _dict.Add(converter.ConvertType, converter);
+
+            if (replaceExisted)
+                _dict[converter.ConvertType] = converter;
+            else
+                _dict.Add(converter.ConvertType, converter);
         }
+
+        public void Add(XConverter converter) { Add(converter, false); }
 
         public bool Remove(XConverter converter)
         {

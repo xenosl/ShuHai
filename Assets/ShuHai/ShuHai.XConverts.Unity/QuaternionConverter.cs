@@ -10,12 +10,12 @@ namespace ShuHai.XConverts.Unity
         protected override string ValueToString(object value, XConvertSettings settings)
         {
             var q = (Quaternion)value;
-            return MergeValues(new[] { q.x, q.y, q.z, q.w }, settings.FloatingPointStyle);
+            return Utilities.MergeValues(new[] { q.x, q.y, q.z, q.w });
         }
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = SplitValues(element.Value, settings.FloatingPointStyle);
+            var v = Utilities.SplitValues(element.Value);
             return new Quaternion(v[0], v[1], v[2], v[3]);
         }
     }

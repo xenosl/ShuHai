@@ -1,11 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using ShuHai.XConverts.Converters;
 
 namespace ShuHai.XConverts
 {
     public class XConvertsTests
     {
+        public static XConvertSettings SettingsForByteValues { get; } = CreateSettingsForByteValues();
+
+        private static XConvertSettings CreateSettingsForByteValues()
+        {
+            var converters = new ConverterCollection(XConverter.BuiltIns.Values)
+            {
+                { new BooleanConverter(ValueStyle.Byte), true },
+                { new CharConverter(ValueStyle.Byte), true },
+                { new ByteConverter(ValueStyle.Byte), true },
+                { new SByteConverter(ValueStyle.Byte), true },
+                { new Int16Converter(ValueStyle.Byte), true },
+                { new UInt16Converter(ValueStyle.Byte), true },
+                { new Int32Converter(ValueStyle.Byte), true },
+                { new UInt32Converter(ValueStyle.Byte), true },
+                { new Int64Converter(ValueStyle.Byte), true },
+                { new UInt64Converter(ValueStyle.Byte), true },
+                { new SingleConverter(ValueStyle.Byte), true },
+                { new DoubleConverter(ValueStyle.Byte), true }
+            };
+            return new XConvertSettings { Converters = converters };
+        }
+
         [Test]
         public void ObjectConvert()
         {
@@ -35,9 +58,8 @@ namespace ShuHai.XConverts
             ConvertTest(c, float.NaN);
             ConvertTest(c, float.Epsilon);
 
-            var bytesForFp = new XConvertSettings { FloatingPointStyle = ValueStyle.Byte };
-            ConvertTest(c, float.MinValue, bytesForFp);
-            ConvertTest(c, float.MaxValue, bytesForFp);
+            ConvertTest(c, float.MinValue, SettingsForByteValues);
+            ConvertTest(c, float.MaxValue, SettingsForByteValues);
         }
 
         [Test]
@@ -53,15 +75,13 @@ namespace ShuHai.XConverts
         public void CollectionConvert()
         {
             var c = XConverter.BuiltIns[typeof(ICollection<>)];
-            var bytesForFp = new XConvertSettings { FloatingPointStyle = ValueStyle.Byte };
-            
             var c0 = new HashSet<string>();
             var c1 = new List<object> { 978.44, Guid.NewGuid() };
             var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, float.MaxValue }, { 4, c1 } };
-            
+
             ConvertTest(c, c0);
             ConvertTest(c, c1);
-            ConvertTest(c, c2, bytesForFp);
+            ConvertTest(c, c2, SettingsForByteValues);
         }
 
         [Test]
