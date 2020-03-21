@@ -3,8 +3,6 @@ using System.Xml.Linq;
 
 namespace ShuHai.XConverts.Converters
 {
-    public enum ValueStyle { Text, Byte }
-
     public abstract class PrimitiveConverter : ValueConverter
     {
 //        public const string ValueStyleAttributeName = "ValueStyle";
@@ -14,11 +12,9 @@ namespace ShuHai.XConverts.Converters
 //            base.PopulateXAttributes(element, @object, settings);
 //        }
 
-        public ValueStyle ValueStyle { get; set; }
-
         protected PrimitiveConverter() { }
 
-        protected PrimitiveConverter(ValueStyle valueStyle) { ValueStyle = valueStyle; }
+        protected PrimitiveConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
         protected override object ToObjectImpl(XElement element, XConvertSettings settings)
         {
@@ -26,145 +22,6 @@ namespace ShuHai.XConverts.Converters
         }
 
         protected abstract object Parse(string value, XConvertSettings settings);
-
-        #region Value Converts
-
-        #region Value To String
-
-        public static string ToString(bool value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(char value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(short value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(ushort value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(int value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(uint value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(long value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(ulong value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(float value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        public static string ToString(double value, ValueStyle style)
-        {
-            return ToString(value, style, BitConverterEx.ToString);
-        }
-
-        private static string ToString<T>(T value, ValueStyle style, Func<T, string> byteConvert)
-        {
-            switch (style)
-            {
-                case ValueStyle.Text:
-                    return value.ToString();
-                case ValueStyle.Byte:
-                    return byteConvert(value);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(style), style, null);
-            }
-        }
-
-        #endregion Value To String
-
-        #region String To Value
-
-        public static char ToChar(string text, ValueStyle style)
-        {
-            return ToValue(text, style, char.Parse, BitConverter.ToChar);
-        }
-
-        public static bool ToBoolean(string text, ValueStyle style)
-        {
-            return ToValue(text, style, bool.Parse, BitConverter.ToBoolean);
-        }
-
-        public static short ToInt16(string text, ValueStyle style)
-        {
-            return ToValue(text, style, short.Parse, BitConverter.ToInt16);
-        }
-
-        public static ushort ToUInt16(string text, ValueStyle style)
-        {
-            return ToValue(text, style, ushort.Parse, BitConverter.ToUInt16);
-        }
-
-        public static int ToInt32(string text, ValueStyle style)
-        {
-            return ToValue(text, style, int.Parse, BitConverter.ToInt32);
-        }
-
-        public static uint ToUInt32(string text, ValueStyle style)
-        {
-            return ToValue(text, style, uint.Parse, BitConverter.ToUInt32);
-        }
-
-        public static long ToInt64(string text, ValueStyle style)
-        {
-            return ToValue(text, style, long.Parse, BitConverter.ToInt64);
-        }
-
-        public static ulong ToUInt64(string text, ValueStyle style)
-        {
-            return ToValue(text, style, ulong.Parse, BitConverter.ToUInt64);
-        }
-
-        public static float ToSingle(string text, ValueStyle style)
-        {
-            return ToValue(text, style, float.Parse, BitConverter.ToSingle);
-        }
-
-        public static double ToDouble(string text, ValueStyle style)
-        {
-            return ToValue(text, style, double.Parse, BitConverter.ToDouble);
-        }
-
-        private static T ToValue<T>(string text, ValueStyle style,
-            Func<string, T> textParser, Func<byte[], int, T> byteParser)
-        {
-            switch (style)
-            {
-                case ValueStyle.Text:
-                    return textParser(text);
-                case ValueStyle.Byte:
-                    return byteParser(BitConverterEx.FromString(text), 0);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(style), style, null);
-            }
-        }
-
-        #endregion String To Value
-
-        #endregion Value Converts
     }
 
     [XConvertType(typeof(bool))]
@@ -173,7 +30,15 @@ namespace ShuHai.XConverts.Converters
         public BooleanConverter() { }
         public BooleanConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return bool.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((bool)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings)
+        {
+            return ToBoolean(value, ValueStyle);
+        }
     }
 
     [XConvertType(typeof(char))]
@@ -182,7 +47,12 @@ namespace ShuHai.XConverts.Converters
         public CharConverter() { }
         public CharConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return char.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((char)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToChar(value, ValueStyle); }
     }
 
     [XConvertType(typeof(byte))]
@@ -191,7 +61,12 @@ namespace ShuHai.XConverts.Converters
         public ByteConverter() { }
         public ByteConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return byte.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((byte)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToByte(value, ValueStyle); }
     }
 
     [XConvertType(typeof(sbyte))]
@@ -200,7 +75,12 @@ namespace ShuHai.XConverts.Converters
         public SByteConverter() { }
         public SByteConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return sbyte.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((sbyte)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToSByte(value, ValueStyle); }
     }
 
     [XConvertType(typeof(short))]
@@ -209,7 +89,12 @@ namespace ShuHai.XConverts.Converters
         public Int16Converter() { }
         public Int16Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return short.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((short)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToInt16(value, ValueStyle); }
     }
 
     [XConvertType(typeof(ushort))]
@@ -218,7 +103,12 @@ namespace ShuHai.XConverts.Converters
         public UInt16Converter() { }
         public UInt16Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return ushort.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((ushort)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToUInt16(value, ValueStyle); }
     }
 
     [XConvertType(typeof(int))]
@@ -227,7 +117,12 @@ namespace ShuHai.XConverts.Converters
         public Int32Converter() { }
         public Int32Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return int.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((int)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToInt32(value, ValueStyle); }
     }
 
     [XConvertType(typeof(uint))]
@@ -236,7 +131,12 @@ namespace ShuHai.XConverts.Converters
         public UInt32Converter() { }
         public UInt32Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return uint.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((uint)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToUInt32(value, ValueStyle); }
     }
 
     [XConvertType(typeof(long))]
@@ -245,7 +145,12 @@ namespace ShuHai.XConverts.Converters
         public Int64Converter() { }
         public Int64Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return long.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((long)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToInt64(value, ValueStyle); }
     }
 
     [XConvertType(typeof(ulong))]
@@ -254,7 +159,12 @@ namespace ShuHai.XConverts.Converters
         public UInt64Converter() { }
         public UInt64Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object Parse(string value, XConvertSettings settings) { return ulong.Parse(value); }
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return ToString((ulong)value, ValueStyle);
+        }
+
+        protected override object Parse(string value, XConvertSettings settings) { return ToUInt64(value, ValueStyle); }
     }
 
     [XConvertType(typeof(float))]
@@ -291,9 +201,14 @@ namespace ShuHai.XConverts.Converters
         public IntPtrConverter() { }
         public IntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return IntPtr.Size == 4 ? ToString((int)value, ValueStyle) : ToString((long)value, ValueStyle);
+        }
+
         protected override object Parse(string value, XConvertSettings settings)
         {
-            return IntPtr.Size == 4 ? (IntPtr)int.Parse(value) : (IntPtr)long.Parse(value);
+            return IntPtr.Size == 4 ? (IntPtr)ToInt32(value, ValueStyle) : (IntPtr)ToInt64(value, ValueStyle);
         }
     }
 
@@ -303,9 +218,14 @@ namespace ShuHai.XConverts.Converters
         public UIntPtrConverter() { }
         public UIntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            return UIntPtr.Size == 4 ? ToString((uint)value, ValueStyle) : ToString((ulong)value, ValueStyle);
+        }
+
         protected override object Parse(string value, XConvertSettings settings)
         {
-            return UIntPtr.Size == 4 ? (UIntPtr)uint.Parse(value) : (UIntPtr)ulong.Parse(value);
+            return UIntPtr.Size == 4 ? (UIntPtr)ToUInt32(value, ValueStyle) : (UIntPtr)ToUInt64(value, ValueStyle);
         }
     }
 }
