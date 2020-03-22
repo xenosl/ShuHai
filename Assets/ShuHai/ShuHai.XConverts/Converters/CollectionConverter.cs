@@ -16,7 +16,7 @@ namespace ShuHai.XConverts.Converters
             var collection = (IEnumerable)@object;
             foreach (var item in collection)
             {
-                var converter = XConvert.FindAppropriateConverter(settings.Converters, item, itemType);
+                var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, item, itemType);
                 var childElement = converter.ToXElement(item, "Item", settings);
                 element.Add(childElement);
             }
@@ -32,7 +32,7 @@ namespace ShuHai.XConverts.Converters
                 object item = null;
                 if (itemType != null)
                 {
-                    var converter = XConvert.FindAppropriateConverter(settings.Converters, itemType);
+                    var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, itemType);
                     item = converter.ToObject(childElement, settings);
                 }
                 addMethod.Invoke(@object, new[] { item });

@@ -16,6 +16,6 @@ namespace ShuHai.XConverts
         ///     Converters used during converts. <see cref="XConverter.BuiltIns" /> is used if the value is
         ///     <see langword="null" />.
         /// </summary>
-        public ConverterCollection Converters;
+        public XConverterCollection Converters;
     }
 }

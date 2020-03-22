@@ -6,7 +6,7 @@ namespace ShuHai.XConverts
 {
     using DictItem = KeyValuePair<Type, XConverter>;
 
-    public interface IReadOnlyConverterCollection : IReadOnlyDictionary<Type, XConverter>
+    public interface IReadOnlyXConverterCollection : IReadOnlyDictionary<Type, XConverter>
     {
         bool TryGet(Type convertType, out XConverter converter);
 
@@ -15,7 +15,7 @@ namespace ShuHai.XConverts
         bool ContainsConvertType(Type convertType);
     }
 
-    public class ConverterCollection : ICollection<XConverter>, IReadOnlyConverterCollection
+    public class XConverterCollection : ICollection<XConverter>, IReadOnlyXConverterCollection
     {
         public int Count => _dict.Count;
 
@@ -28,9 +28,9 @@ namespace ShuHai.XConverts
             }
         }
 
-        public ConverterCollection() { }
+        public XConverterCollection() { }
 
-        public ConverterCollection(IEnumerable<XConverter> converters) { this.AddRange(converters); }
+        public XConverterCollection(IEnumerable<XConverter> converters) { this.AddRange(converters); }
 
         public void Add(XConverter converter, bool replaceExisted)
         {

@@ -11,7 +11,7 @@ namespace ShuHai.XConverts
 
         private static XConvertSettings CreateSettingsForByteValues()
         {
-            var converters = new ConverterCollection(XConverter.BuiltIns.Values)
+            var converters = new XConverterCollection(XConverter.BuiltIns.Values)
             {
                 { new BooleanConverter(ValueStyle.Byte), true },
                 { new CharConverter(ValueStyle.Byte), true },
