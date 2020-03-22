@@ -11,7 +11,6 @@ namespace ShuHai.XConverts.Converters
         public ValueStyle ValueStyle { get; set; }
 
         protected ValueConverter() { }
-
         protected ValueConverter(ValueStyle valueStyle) { ValueStyle = valueStyle; }
 
         #region Value To XElement
@@ -34,7 +33,7 @@ namespace ShuHai.XConverts.Converters
 
         #region XElement To Value
 
-        protected sealed override void PopulateObjectMembersImpl(
+        protected sealed override void PopulateObjectMembers(
             object @object, XElement element, XConvertSettings settings)
         {
             // Nothing to do...

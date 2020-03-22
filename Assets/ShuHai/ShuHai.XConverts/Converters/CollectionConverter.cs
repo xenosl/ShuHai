@@ -22,7 +22,7 @@ namespace ShuHai.XConverts.Converters
             }
         }
 
-        protected override void PopulateObjectMembersImpl(object @object, XElement element, XConvertSettings settings)
+        protected override void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
             var type = CollectionTypeOf(@object);
             var addMethod = type.GetMethod("Add", new[] { ItemTypeOf(type) });

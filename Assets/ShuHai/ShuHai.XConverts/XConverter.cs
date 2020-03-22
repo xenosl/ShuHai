@@ -117,11 +117,12 @@ namespace ShuHai.XConverts
         protected virtual void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
             var type = @object.GetType();
-            foreach (var field in EnumerateConvertibleFields(type))
+            foreach (var member in SelectConvertMembers(type))
             {
-                var value = field.GetValue(@object);
-                var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, value, field.FieldType);
-                var fieldXElem = converter.ToXElement(value, field.Name, settings);
+                var value = GetMemberValue(member, @object);
+                var converter =
+                    XConverterSelector.SelectWithBuiltins(settings.Converters, value, GetTypeOfMember(member));
+                var fieldXElem = converter.ToXElement(value, member.Name, settings);
                 element.Add(fieldXElem);
             }
         }
@@ -130,14 +131,10 @@ namespace ShuHai.XConverts
 
         #region XElement To Object
 
-        public object ToObject(XElement element, XConvertSettings settings = null)
+        public object ToObject(XElement element, XConvertSettings settings)
         {
             Ensure.Argument.NotNull(element, nameof(element));
-            return ToObjectImpl(element, settings ?? XConvertSettings.Default);
-        }
-        
-        protected virtual object ToObjectImpl(XElement element, XConvertSettings settings)
-        {
+
             var type = ParseObjectType(element);
             if (type == null)
                 return null;
@@ -146,7 +143,7 @@ namespace ShuHai.XConverts
                 throw new XmlException($"Can not convert specified xml element to '{type}' by {GetType()}.");
 
             var @object = CreateObject(element, type, settings);
-            PopulateObjectMembersImpl(@object, element, settings);
+            PopulateObjectMembers(@object, element, settings);
             return @object;
         }
 
@@ -164,33 +161,98 @@ namespace ShuHai.XConverts
         ///     Convert settings used during the convert. <see cref="XConvertSettings.Default" /> is used if the value is
         ///     <see langword="null" />.
         /// </param>
-        public void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
+        protected virtual void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
-            Ensure.Argument.NotNull(@object, nameof(@object));
-            PopulateObjectMembersImpl(@object, element, settings ?? XConvertSettings.Default);
-        }
-
-        protected virtual void PopulateObjectMembersImpl(object @object, XElement element, XConvertSettings settings)
-        {
-            var fieldDict = EnumerateConvertibleFields(@object.GetType()).ToDictionary(f => f.Name);
+            var memberDict = SelectConvertMembers(@object.GetType()).ToDictionary(f => f.Name);
             foreach (var childElement in element.Elements())
             {
-                if (!fieldDict.TryGetValue(childElement.Name.LocalName, out var field))
+                if (!memberDict.TryGetValue(childElement.Name.LocalName, out var member))
                     continue;
 
-                var fieldType = ParseObjectType(childElement);
-                if (fieldType == null)
-                    throw new XmlException($"Type attribute not found for field '{field.Name}'.");
+                var childType = ParseObjectType(childElement);
+                if (childType == null)
+                    throw new XmlException($"Type attribute not found for member '{member.Name}'.");
 
-                if (!field.FieldType.IsAssignableFrom(fieldType))
+                if (!GetTypeOfMember(member).IsAssignableFrom(childType))
                     continue;
 
-                var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, fieldType);
-                field.SetValue(@object, converter.ToObject(childElement, settings));
+                var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, childType);
+                SetMemberValue(member, @object, converter.ToObject(childElement, settings));
             }
         }
 
         #endregion XElement To Object
+
+        #region Object Members
+
+        protected virtual IEnumerable<MemberInfo> SelectConvertMembers(Type type)
+        {
+            return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(IsValidMember);
+        }
+
+        private static bool IsValidMember(MemberInfo member)
+        {
+            var mt = member.MemberType;
+            if (mt != MemberTypes.Property && mt != MemberTypes.Field)
+                return false;
+
+            if (mt == MemberTypes.Property)
+            {
+                var prop = (PropertyInfo)member;
+                if (prop.SetMethod == null || prop.GetMethod == null)
+                    return false;
+            }
+            return !member.IsDefined(typeof(XmlIgnoreAttribute));
+        }
+
+        protected static Type GetTypeOfMember(MemberInfo member)
+        {
+            switch (member.MemberType)
+            {
+                case MemberTypes.Field:
+                    return ((FieldInfo)member).FieldType;
+                case MemberTypes.Property:
+                    return ((PropertyInfo)member).PropertyType;
+                default:
+                    throw NewInvalidMemberTypeException(member);
+            }
+        }
+
+        protected static void SetMemberValue(MemberInfo member, object @object, object value)
+        {
+            switch (member.MemberType)
+            {
+                case MemberTypes.Field:
+                    ((FieldInfo)member).SetValue(@object, value);
+                    break;
+                case MemberTypes.Property:
+                    ((PropertyInfo)member).SetValue(@object, value);
+                    break;
+                default:
+                    throw NewInvalidMemberTypeException(member);
+            }
+        }
+
+        protected static object GetMemberValue(MemberInfo member, object @object)
+        {
+            switch (member.MemberType)
+            {
+                case MemberTypes.Field:
+                    return ((FieldInfo)member).GetValue(@object);
+                case MemberTypes.Property:
+                    return ((PropertyInfo)member).GetValue(@object);
+                default:
+                    throw NewInvalidMemberTypeException(member);
+            }
+        }
+
+        private static InvalidReferenceException NewInvalidMemberTypeException(MemberInfo member)
+        {
+            return new InvalidReferenceException($"Property or field expected, got {member.MemberType}");
+        }
+
+        #endregion Object Members
 
         #region Built-in Instances
 
@@ -240,13 +302,6 @@ namespace ShuHai.XConverts
                 throw new XmlException($@"Failed to load type ""{typeAttr.Value}"".");
 
             return type;
-        }
-
-        public static IEnumerable<FieldInfo> EnumerateConvertibleFields(Type type)
-        {
-            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            //return fields.Where(f => f.IsDefined(typeof(XConvertibleAttribute)));
-            return fields.Where(f => !f.IsDefined(typeof(XmlIgnoreAttribute)));
         }
 
         #endregion Utilities

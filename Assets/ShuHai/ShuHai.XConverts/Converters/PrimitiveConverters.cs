@@ -5,18 +5,10 @@ namespace ShuHai.XConverts.Converters
 {
     public abstract class PrimitiveConverter : ValueConverter
     {
-//        public const string ValueStyleAttributeName = "ValueStyle";
-
-//        protected override void PopulateXAttributes(XElement element, object @object, XConvertSettings settings)
-//        {
-//            base.PopulateXAttributes(element, @object, settings);
-//        }
-
         protected PrimitiveConverter() { }
-
         protected PrimitiveConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override object ToObjectImpl(XElement element, XConvertSettings settings)
+        protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
             return Parse(element.Value, settings);
         }
@@ -200,15 +192,10 @@ namespace ShuHai.XConverts.Converters
     {
         public IntPtrConverter() { }
         public IntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
-
-        protected override string ValueToString(object value, XConvertSettings settings)
-        {
-            return IntPtr.Size == 4 ? ToString((int)value, ValueStyle) : ToString((long)value, ValueStyle);
-        }
-
+        
         protected override object Parse(string value, XConvertSettings settings)
         {
-            return IntPtr.Size == 4 ? (IntPtr)ToInt32(value, ValueStyle) : (IntPtr)ToInt64(value, ValueStyle);
+            return IntPtr.Size == 4 ? (IntPtr)int.Parse(value) : (IntPtr)long.Parse(value);
         }
     }
 
@@ -218,14 +205,9 @@ namespace ShuHai.XConverts.Converters
         public UIntPtrConverter() { }
         public UIntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
-        protected override string ValueToString(object value, XConvertSettings settings)
-        {
-            return UIntPtr.Size == 4 ? ToString((uint)value, ValueStyle) : ToString((ulong)value, ValueStyle);
-        }
-
         protected override object Parse(string value, XConvertSettings settings)
         {
-            return UIntPtr.Size == 4 ? (UIntPtr)ToUInt32(value, ValueStyle) : (UIntPtr)ToUInt64(value, ValueStyle);
+            return UIntPtr.Size == 4 ? (UIntPtr)uint.Parse(value) : (UIntPtr)ulong.Parse(value);
         }
     }
 }
