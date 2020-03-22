@@ -39,6 +39,7 @@ namespace ShuHai.XConverts
             ConvertTest(c, 4.231f);
             ConvertTest(c, 931.5523358);
             ConvertTest(c, Guid.NewGuid());
+            ConvertTest(c, new KeyValuePair<int, string>(12, "Twelve"));
 
             ConvertTest(c, 'c');
             ConvertTest(c, '$');

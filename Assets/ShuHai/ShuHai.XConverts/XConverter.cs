@@ -185,10 +185,13 @@ namespace ShuHai.XConverts
 
         #region Object Members
 
-        protected virtual IEnumerable<MemberInfo> SelectConvertMembers(Type type)
+        protected virtual IReadOnlyList<MemberInfo> SelectConvertMembers(Type type)
         {
             return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(IsValidMember);
+                .Where(IsValidMember) // All valid members.
+                .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case.
+                .Select(g => g.OrderByDescending(m => m, MemberPriorityComparer.Instance).First())
+                .ToList();
         }
 
         private static bool IsValidMember(MemberInfo member)
@@ -250,6 +253,19 @@ namespace ShuHai.XConverts
         private static InvalidReferenceException NewInvalidMemberTypeException(MemberInfo member)
         {
             return new InvalidReferenceException($"Property or field expected, got {member.MemberType}");
+        }
+
+        private static bool IsEquivalentMemberName(string a, string b)
+        {
+            if (a == b)
+                return true;
+
+            var la = a.ToLower();
+            var lb = b.ToLower();
+            if (la == lb)
+                return true;
+
+            return false;
         }
 
         #endregion Object Members
