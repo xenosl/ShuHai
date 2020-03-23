@@ -35,9 +35,9 @@ namespace ShuHai.Graphicode
                     IndexPort.Value = i;
                     BodyPort.Flow();
 
-                    if (needBreak)
+                    if (_needBreak)
                     {
-                        needBreak = false;
+                        _needBreak = false;
                         break;
                     }
                 }
@@ -45,7 +45,7 @@ namespace ShuHai.Graphicode
             }
             else if (byPort == BreakPort)
             {
-                needBreak = true;
+                _needBreak = true;
             }
             else
             {
@@ -53,6 +53,6 @@ namespace ShuHai.Graphicode
             }
         }
 
-        private bool needBreak;
+        private bool _needBreak;
     }
 }
