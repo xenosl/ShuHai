@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using ShuHai.XConverts;
 
 namespace ShuHai.Graphicode
 {
@@ -114,6 +115,7 @@ namespace ShuHai.Graphicode
             return true;
         }
 
+        [XConvertMember("Elements")]
         private readonly HashSet<GraphElement> _elements = new HashSet<GraphElement>();
 
         #endregion Elements

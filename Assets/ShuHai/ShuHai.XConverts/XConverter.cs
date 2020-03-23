@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Serialization;
 
 namespace ShuHai.XConverts
 {
@@ -206,7 +205,7 @@ namespace ShuHai.XConverts
                 if (typeof(Delegate).IsAssignableFrom(field.FieldType))
                     return false;
             }
-            
+
             if (mt == MemberTypes.Property)
             {
                 var prop = (PropertyInfo)member;
@@ -258,7 +257,7 @@ namespace ShuHai.XConverts
                     throw NewInvalidMemberTypeException(member);
             }
         }
-        
+
         protected static string GetMemberConvertName(MemberInfo member)
         {
             var attr = member.GetCustomAttribute<XConvertMemberAttribute>();
@@ -268,19 +267,6 @@ namespace ShuHai.XConverts
         private static InvalidReferenceException NewInvalidMemberTypeException(MemberInfo member)
         {
             return new InvalidReferenceException($"Property or field expected, got {member.MemberType}");
-        }
-
-        private static bool IsEquivalentMemberName(string a, string b)
-        {
-            if (a == b)
-                return true;
-
-            var la = a.ToLower();
-            var lb = b.ToLower();
-            if (la == lb)
-                return true;
-
-            return false;
         }
 
         #endregion Object Members
