@@ -200,10 +200,19 @@ namespace ShuHai.XConverts
             if (mt != MemberTypes.Property && mt != MemberTypes.Field)
                 return false;
 
+            if (mt == MemberTypes.Field)
+            {
+                var field = (FieldInfo)member;
+                if (typeof(Delegate).IsAssignableFrom(field.FieldType))
+                    return false;
+            }
+            
             if (mt == MemberTypes.Property)
             {
                 var prop = (PropertyInfo)member;
                 if (prop.SetMethod == null || prop.GetMethod == null)
+                    return false;
+                if (typeof(Delegate).IsAssignableFrom(prop.PropertyType))
                     return false;
             }
             return !member.IsDefined(typeof(XConvertIgnoreAttribute));
