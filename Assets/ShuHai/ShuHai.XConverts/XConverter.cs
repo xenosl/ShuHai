@@ -206,7 +206,7 @@ namespace ShuHai.XConverts
                 if (prop.SetMethod == null || prop.GetMethod == null)
                     return false;
             }
-            return !member.IsDefined(typeof(XmlIgnoreAttribute));
+            return !member.IsDefined(typeof(XConvertIgnoreAttribute));
         }
 
         protected static Type GetTypeOfMember(MemberInfo member)
