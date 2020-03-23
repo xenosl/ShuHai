@@ -122,7 +122,7 @@ namespace ShuHai.XConverts
                 var value = GetMemberValue(member, @object);
                 var converter =
                     XConverterSelector.SelectWithBuiltins(settings.Converters, value, GetTypeOfMember(member));
-                var fieldXElem = converter.ToXElement(value, member.Name, settings);
+                var fieldXElem = converter.ToXElement(value, GetMemberConvertName(member), settings);
                 element.Add(fieldXElem);
             }
         }
@@ -163,7 +163,7 @@ namespace ShuHai.XConverts
         /// </param>
         protected virtual void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
-            var memberDict = SelectConvertMembers(@object.GetType()).ToDictionary(f => f.Name);
+            var memberDict = SelectConvertMembers(@object.GetType()).ToDictionary(GetMemberConvertName);
             foreach (var childElement in element.Elements())
             {
                 if (!memberDict.TryGetValue(childElement.Name.LocalName, out var member))
@@ -257,6 +257,12 @@ namespace ShuHai.XConverts
                 default:
                     throw NewInvalidMemberTypeException(member);
             }
+        }
+        
+        protected static string GetMemberConvertName(MemberInfo member)
+        {
+            var attr = member.GetCustomAttribute<XConvertMemberAttribute>();
+            return attr != null ? attr.Name : member.Name;
         }
 
         private static InvalidReferenceException NewInvalidMemberTypeException(MemberInfo member)
