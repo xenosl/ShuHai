@@ -64,6 +64,14 @@ namespace ShuHai.XConverts
         }
 
         [Test]
+        public void TypeConvert()
+        {
+            var c = XConverter.BuiltIns[typeof(Type)];
+            ConvertTest(c, typeof(string));
+            ConvertTest(c, typeof(XConvertsTests));
+        }
+
+        [Test]
         public void StringConvert()
         {
             var c = XConverter.BuiltIns[typeof(string)];

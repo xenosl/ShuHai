@@ -152,13 +152,18 @@ namespace ShuHai
         public static Type GetType(string name)
         {
             Ensure.Argument.NotNullOrEmpty(name, nameof(name));
+            return GetType(TypeName.Get(name));
+        }
 
-            var typeName = TypeName.Get(name);
-            if (!_typesByName.TryGetValue(typeName, out var type))
+        public static Type GetType(TypeName name)
+        {
+            Ensure.Argument.NotNull(name, nameof(name));
+
+            if (!_typesByName.TryGetValue(name, out var type))
             {
-                type = MakeType(typeName);
+                type = MakeType(name);
                 if (type != null)
-                    _typesByName.Add(typeName, type);
+                    _typesByName.Add(name, type);
             }
             return type;
         }
