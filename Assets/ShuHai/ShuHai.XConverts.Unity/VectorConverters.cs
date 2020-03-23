@@ -16,7 +16,7 @@ namespace ShuHai.XConverts.Unity
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = Utilities.SplitValues(element.Value);
+            var v = Utilities.SplitSingleValues(element.Value);
             return new Vector2(v[0], v[1]);
         }
     }
@@ -32,7 +32,7 @@ namespace ShuHai.XConverts.Unity
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = Utilities.SplitValues(element.Value);
+            var v = Utilities.SplitSingleValues(element.Value);
             return new Vector3(v[0], v[1], v[2]);
         }
     }
@@ -48,8 +48,40 @@ namespace ShuHai.XConverts.Unity
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = Utilities.SplitValues(element.Value);
+            var v = Utilities.SplitSingleValues(element.Value);
             return new Vector4(v[0], v[1], v[2], v[3]);
+        }
+    }
+
+    [XConvertType(typeof(Vector2Int))]
+    public class Vector2IntConverter : ValueConverter
+    {
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            var vec = (Vector2Int)value;
+            return Utilities.MergeValues(new[] { vec.x, vec.y });
+        }
+
+        protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
+        {
+            var v = Utilities.SplitIntValues(element.Value);
+            return new Vector2Int(v[0], v[1]);
+        }
+    }
+
+    [XConvertType(typeof(Vector3Int))]
+    public class Vector3IntConverter : ValueConverter
+    {
+        protected override string ValueToString(object value, XConvertSettings settings)
+        {
+            var vec = (Vector3Int)value;
+            return Utilities.MergeValues(new[] { vec.x, vec.y, vec.z });
+        }
+
+        protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
+        {
+            var v = Utilities.SplitIntValues(element.Value);
+            return new Vector3Int(v[0], v[1], v[2]);
         }
     }
 }

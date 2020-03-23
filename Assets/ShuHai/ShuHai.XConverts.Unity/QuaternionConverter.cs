@@ -15,7 +15,7 @@ namespace ShuHai.XConverts.Unity
 
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            var v = Utilities.SplitValues(element.Value);
+            var v = Utilities.SplitSingleValues(element.Value);
             return new Quaternion(v[0], v[1], v[2], v[3]);
         }
     }

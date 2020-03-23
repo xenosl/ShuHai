@@ -37,6 +37,24 @@ namespace ShuHai.XConverts.Unity.Tests
         }
 
         [Test]
+        public void Vector2IntConvert()
+        {
+            var c = new Vector2IntConverter();
+            XConvertsTests.ConvertTest(c, Vector2Int.zero);
+            XConvertsTests.ConvertTest(c, Vector2Int.one);
+            XConvertsTests.ConvertTest(c, new Vector2Int(int.MinValue, int.MaxValue));
+        }
+
+        [Test]
+        public void Vector3IntConvert()
+        {
+            var c = new Vector3IntConverter();
+            XConvertsTests.ConvertTest(c, Vector3Int.zero);
+            XConvertsTests.ConvertTest(c, Vector3Int.one);
+            XConvertsTests.ConvertTest(c, new Vector3Int(int.MinValue, int.MaxValue, 0));
+        }
+
+        [Test]
         public void QuaternionConvert()
         {
             var c = new QuaternionConverter();
@@ -44,6 +62,14 @@ namespace ShuHai.XConverts.Unity.Tests
             XConvertsTests.ConvertTest(c, Quaternion.identity);
             //XConvertsTests.ConvertTest(c, Quaternion.AngleAxis(0.2577662f, Vector3.back), bytesForFp);
             //XConvertsTests.ConvertTest(c, new Quaternion(0.55477f, 0.77f, float.MinValue, 1), bytesForFp);
+        }
+
+        [Test]
+        public void RectConvert()
+        {
+            var c = new RectConverter();
+            XConvertsTests.ConvertTest(c, Rect.zero);
+            XConvertsTests.ConvertTest(c, new Rect(0f, 22.43f, 280f, 2244.11f));
         }
     }
 }
