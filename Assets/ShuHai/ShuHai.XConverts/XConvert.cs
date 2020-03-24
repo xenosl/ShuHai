@@ -17,7 +17,7 @@ namespace ShuHai.XConverts
             return converter.ToXElement(obj, elementName, settings);
         }
 
-        public static object ToObject(XElement element, XConvertSettings settings)
+        public static object ToObject(XElement element, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNull(element, nameof(element));
 

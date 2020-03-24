@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters;
 using NUnit.Framework;
-using UnityEditor.SceneManagement;
 
 namespace ShuHai
 {
@@ -12,7 +11,7 @@ namespace ShuHai
         #region Test Generic Type
 
         public static readonly Type GenericType =
-            typeof(Dictionary<string, KeyValuePair<TypeCache, EditorSceneManager>>);
+            typeof(Dictionary<string, KeyValuePair<TypeCache, Type>>);
 
         [Test]
         public void GenericTypeTests()
@@ -52,7 +51,7 @@ namespace ShuHai
             Assert.AreEqual(arg0.GenericParent, root);
 
             var arg1 = root.GetGenericArgument(1);
-            InstanceTest<KeyValuePair<TypeCache, EditorSceneManager>>(arg1, hasAssembly);
+            InstanceTest<KeyValuePair<TypeCache, Type>>(arg1, hasAssembly);
             Assert.AreEqual(Type.GetType(arg1.DeclareName), typeof(KeyValuePair<,>));
             Assert.AreEqual(arg1.GenericParent, root);
 
@@ -72,7 +71,7 @@ namespace ShuHai
         #region Test Nested Generic Type
 
         public static readonly Type NestedGenericArrayType =
-            typeof(NestedGeneric<string, KeyValuePair<TypeCache, EditorSceneManager[,]>>[][]);
+            typeof(NestedGeneric<string, KeyValuePair<TypeCache, Type[,]>>[][]);
 
         [Test]
         public void NestedGenericArrayTypeTests()
@@ -110,7 +109,7 @@ namespace ShuHai
             Assert.AreEqual(root, arg0.GenericParent);
 
             var arg1 = root.GetGenericArgument(1);
-            InstanceTest<KeyValuePair<TypeCache, EditorSceneManager[,]>>(arg1, hasAssembly);
+            InstanceTest<KeyValuePair<TypeCache, Type[,]>>(arg1, hasAssembly);
             Assert.AreEqual(root, arg1.GenericParent);
 
             var arg10 = arg1.GetGenericArgument(0);
@@ -118,7 +117,7 @@ namespace ShuHai
             Assert.AreEqual(arg1, arg10.GenericParent);
 
             var arg11 = arg1.GetGenericArgument(1);
-            InstanceTest<EditorSceneManager[,]>(arg11, hasAssembly);
+            InstanceTest<Type[,]>(arg11, hasAssembly);
             Assert.AreEqual(arg1, arg11.GenericParent);
         }
 
