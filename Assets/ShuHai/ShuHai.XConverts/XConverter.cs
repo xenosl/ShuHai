@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -14,16 +13,6 @@ namespace ShuHai.XConverts
     [XConvertType(typeof(object))]
     public class XConverter
     {
-        /// <summary>
-        ///     Name of the attribute that sepcifies the type of an object.
-        /// </summary>
-        public const string TypeAttributeName = "Type";
-
-        /// <summary>
-        ///     Attribute name for <see langword="null" /> type.
-        /// </summary>
-        public const string NullTypeName = "$null";
-
         public static readonly XConverter Default = new XConverter();
 
         protected XConverter() { ConvertType = GetConvertType(); }
@@ -108,7 +97,7 @@ namespace ShuHai.XConverts
 
         protected virtual void PopulateXAttributes(XElement element, object @object, XConvertSettings settings)
         {
-            WriteObjectType(element, @object?.GetType(), settings.AssemblyNameStyle);
+            XConvert.WriteObjectType(element, @object?.GetType(), settings.AssemblyNameStyle);
         }
 
         protected virtual void PopulateXElementValue(XElement element, object @object, XConvertSettings settings) { }
@@ -117,13 +106,7 @@ namespace ShuHai.XConverts
         {
             var type = @object.GetType();
             foreach (var member in SelectConvertMembers(type))
-            {
-                var value = GetMemberValue(member, @object);
-                var converter =
-                    XConverterSelector.SelectWithBuiltins(settings.Converters, value, GetTypeOfMember(member));
-                var fieldXElem = converter.ToXElement(value, GetMemberConvertName(member), settings);
-                element.Add(fieldXElem);
-            }
+                element.Add(XConvert.ToXElement(member, @object, settings));
         }
 
         #endregion Object To XElement
@@ -134,7 +117,7 @@ namespace ShuHai.XConverts
         {
             Ensure.Argument.NotNull(element, nameof(element));
 
-            var type = ParseObjectType(element);
+            var type = XConvert.ParseObjectType(element);
             if (type == null)
                 return null;
 
@@ -162,21 +145,11 @@ namespace ShuHai.XConverts
         /// </param>
         protected virtual void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
-            var memberDict = SelectConvertMembers(@object.GetType()).ToDictionary(GetMemberConvertName);
+            var memberDict = SelectConvertMembers(@object.GetType()).ToDictionary(XConvert.XElementNameOf);
             foreach (var childElement in element.Elements())
             {
-                if (!memberDict.TryGetValue(childElement.Name.LocalName, out var member))
-                    continue;
-
-                var childType = ParseObjectType(childElement);
-                if (childType == null)
-                    throw new XmlException($"Type attribute not found for member '{member.Name}'.");
-
-                if (!GetTypeOfMember(member).IsAssignableFrom(childType))
-                    continue;
-
-                var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, childType);
-                SetMemberValue(member, @object, converter.ToObject(childElement, settings));
+                if (memberDict.TryGetValue(childElement.Name.LocalName, out var member))
+                    member.SetValue(@object, childElement, settings);
             }
         }
 
@@ -217,58 +190,6 @@ namespace ShuHai.XConverts
             return !member.IsDefined(typeof(XConvertIgnoreAttribute));
         }
 
-        protected static Type GetTypeOfMember(MemberInfo member)
-        {
-            switch (member.MemberType)
-            {
-                case MemberTypes.Field:
-                    return ((FieldInfo)member).FieldType;
-                case MemberTypes.Property:
-                    return ((PropertyInfo)member).PropertyType;
-                default:
-                    throw NewInvalidMemberTypeException(member);
-            }
-        }
-
-        protected static void SetMemberValue(MemberInfo member, object @object, object value)
-        {
-            switch (member.MemberType)
-            {
-                case MemberTypes.Field:
-                    ((FieldInfo)member).SetValue(@object, value);
-                    break;
-                case MemberTypes.Property:
-                    ((PropertyInfo)member).SetValue(@object, value);
-                    break;
-                default:
-                    throw NewInvalidMemberTypeException(member);
-            }
-        }
-
-        protected static object GetMemberValue(MemberInfo member, object @object)
-        {
-            switch (member.MemberType)
-            {
-                case MemberTypes.Field:
-                    return ((FieldInfo)member).GetValue(@object);
-                case MemberTypes.Property:
-                    return ((PropertyInfo)member).GetValue(@object);
-                default:
-                    throw NewInvalidMemberTypeException(member);
-            }
-        }
-
-        protected static string GetMemberConvertName(MemberInfo member)
-        {
-            var attr = member.GetCustomAttribute<XConvertMemberAttribute>();
-            return attr != null ? attr.Name : member.Name;
-        }
-
-        private static InvalidReferenceException NewInvalidMemberTypeException(MemberInfo member)
-        {
-            return new InvalidReferenceException($"Property or field expected, got {member.MemberType}");
-        }
-
         #endregion Object Members
 
         #region Built-in Instances
@@ -292,36 +213,6 @@ namespace ShuHai.XConverts
         }
 
         #endregion Built-in Instances
-
-        #region Utilities
-
-        public static void WriteObjectType(XElement element, Type type,
-            FormatterAssemblyStyle? style = FormatterAssemblyStyle.Simple)
-        {
-            var typeName = type == null ? NullTypeName : TypeName.Get(type).ToString(style);
-            var attr = element.Attribute(TypeAttributeName);
-            if (attr == null)
-                element.Add(new XAttribute(TypeAttributeName, typeName));
-            else
-                attr.Value = typeName;
-        }
-
-        public static Type ParseObjectType(XElement element)
-        {
-            var typeAttr = element.Attribute(TypeAttributeName);
-            if (typeAttr == null)
-                return null;
-            if (typeAttr.Value == NullTypeName)
-                return null;
-
-            var type = TypeCache.GetType(typeAttr.Value);
-            if (type == null)
-                throw new XmlException($@"Failed to load type ""{typeAttr.Value}"".");
-
-            return type;
-        }
-
-        #endregion Utilities
 
         static XConverter() { BuiltIns = InitializeBuiltIns(); }
     }

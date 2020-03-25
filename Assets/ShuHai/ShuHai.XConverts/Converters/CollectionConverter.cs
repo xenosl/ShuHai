@@ -28,7 +28,7 @@ namespace ShuHai.XConverts.Converters
             var addMethod = type.GetMethod("Add", new[] { ItemTypeOf(type) });
             foreach (var childElement in element.Elements())
             {
-                var itemType = ParseObjectType(childElement);
+                var itemType = XConvert.ParseObjectType(childElement);
                 object item = null;
                 if (itemType != null)
                 {
