@@ -32,13 +32,14 @@ namespace ShuHai.EditSystem
 
         public EditorObject GetObject(int order) { return _objects.TryGetValue(order, out var obj) ? obj : null; }
 
-        private readonly Dictionary<int, EditorObject> _objects = new Dictionary<int, EditorObject>();
+        [XConvertMember("Objects")]
+        private Dictionary<int, EditorObject> _objects = new Dictionary<int, EditorObject>();
 
         private void AddObject(EditorObject obj)
         {
             _objects.Add(obj.Order, obj);
             obj.Owner = this;
-            
+
             ObjectAdded?.Invoke(obj);
         }
 
@@ -48,10 +49,10 @@ namespace ShuHai.EditSystem
                 return false;
 
             ObjectRemoving?.Invoke(obj);
-            
+
             obj.Owner = null;
             _objects.Remove(order);
-            
+
             return true;
         }
 
@@ -62,27 +63,7 @@ namespace ShuHai.EditSystem
                 RemoveObject(id);
         }
 
-        private int _nextObjectOrder = 1;
-
-        #region Serialization
-
-        public XElement Serialize(string elementName)
-        {
-            var root = new XElement(elementName);
-            var objects = _objects.Values.OrderBy(w => w.Order);
-            foreach (var eo in objects)
-                root.Add(XConvert.ToXElement(eo.Value, eo.GetType().Name));
-            return root;
-        }
-
-        public void Deserialize(XElement root)
-        {
-            ClearObjects();
-            foreach (var data in root.Elements())
-                AddObject(XConvert.ToObject(data));
-        }
-
-        #endregion Serialization
+        [XConvertMember("NextObjectOrder")] private int _nextObjectOrder = 1;
 
         #endregion Objects
 
