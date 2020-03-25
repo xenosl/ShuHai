@@ -181,6 +181,19 @@ namespace ShuHai.XConverts
             return attr != null ? attr.Name : member.Name;
         }
 
+        public static bool IsValidXElementName(string name)
+        {
+            try
+            {
+                XmlConvert.VerifyName(name);
+            }
+            catch (XmlException)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private static void ArgOrDefault(ref XConvertSettings settings)
         {
             if (settings == null)

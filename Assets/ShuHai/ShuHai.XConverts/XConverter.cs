@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -131,7 +132,7 @@ namespace ShuHai.XConverts
 
         protected virtual object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
-            return Activator.CreateInstance(type);
+            return Activator.CreateInstance(type, true);
         }
 
         /// <summary>
@@ -187,6 +188,12 @@ namespace ShuHai.XConverts
                 if (typeof(Delegate).IsAssignableFrom(prop.PropertyType))
                     return false;
             }
+
+            if (!XConvert.IsValidXElementName(member.Name))
+                return false;
+
+            if (member.IsDefined(typeof(CompilerGeneratedAttribute)))
+                return false;
             return !member.IsDefined(typeof(XConvertIgnoreAttribute));
         }
 
