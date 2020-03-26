@@ -143,7 +143,7 @@ namespace ShuHai.Unity
 
         private static void VerifyComponentType(Type type)
         {
-            if (type.FindDefaultConstructor() == null)
+            if (type.GetDefaultConstructor() == null)
             {
                 throw new InvalidOperationException(
                     $"A default constructor({type}) is required as Root Component.");

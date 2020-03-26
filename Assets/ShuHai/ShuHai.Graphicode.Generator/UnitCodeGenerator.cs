@@ -146,7 +146,8 @@ namespace ShuHai.Graphicode.Generator
         {
             public static readonly Type Type = typeof(Unit);
 
-            public static readonly PropertyInfo NameProperty = Type.BaseType.FindProperty("Name");
+            public static readonly PropertyInfo NameProperty =
+                Type.BaseType.GetProperty("Name", BindingAttributes.DeclareInstance);
 
             public const string InputValuePortsPropertyName = "InputValuePorts";
             public const string OutputValuePortsPropertyName = "OutputValuePorts";
@@ -154,7 +155,8 @@ namespace ShuHai.Graphicode.Generator
             public const string AddInputValuePortMethodName = "AddInputValuePort";
             public const string AddOutputValuePortMethodName = "AddOutputValuePort";
 
-            public static readonly MethodInfo ExecuteImplMethod = Type.FindMethod("ExecuteImpl");
+            public static readonly MethodInfo ExecuteImplMethod =
+                Type.GetMethod("ExecuteImpl", BindingAttributes.DeclareInstance);
         }
 
         private static CodeMethodReferenceExpression NewAddInputValuePortMethodReference(Type valueType)
