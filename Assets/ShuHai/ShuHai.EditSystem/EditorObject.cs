@@ -1,27 +1,45 @@
 using System;
+using System.Diagnostics;
 using ShuHai.XConverts;
 
 namespace ShuHai.EditSystem
 {
     public sealed class EditorObject : IEquatable<EditorObject>
     {
-        [XConvertIgnore] public Editor Owner { get; internal set; }
-
         /// <summary>
         ///     Creation order of current object.
         /// </summary>
         [XConvertIgnore]
         public int Order { get; private set; }
 
-        public object Value { get; private set; }
+        public string Name;
 
-        internal EditorObject() { }
+        public object Value { get; }
 
-        internal EditorObject(int order, object value)
+        internal EditorObject(object value) { Value = value; }
+
+        #region Owner
+
+        [XConvertIgnore]
+        public Editor Owner { get; private set; }
+
+        internal void OnAddToEditor(Editor editor, int order)
         {
+            Debug.Assert(Owner == null);
+
+            Owner = editor;
             Order = order;
-            Value = value;
         }
+
+        internal void OnRemoveFromEditor(Editor editor)
+        {
+            Debug.Assert(Owner == editor);
+
+            Order = default;
+            Owner = null;
+        }
+
+        #endregion Owner
 
         #region Comparsion
 

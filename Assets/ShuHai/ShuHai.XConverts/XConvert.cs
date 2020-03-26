@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters;
 using System.Xml;
 using System.Xml.Linq;
@@ -9,6 +10,36 @@ namespace ShuHai.XConverts
     public static class XConvert
     {
         #region Convert
+
+        public static bool CanConvert(MemberInfo member)
+        {
+            var mt = member.MemberType;
+            if (mt != MemberTypes.Property && mt != MemberTypes.Field)
+                return false;
+
+            if (mt == MemberTypes.Field)
+            {
+                var field = (FieldInfo)member;
+                if (typeof(Delegate).IsAssignableFrom(field.FieldType))
+                    return false;
+            }
+
+            if (mt == MemberTypes.Property)
+            {
+                var prop = (PropertyInfo)member;
+                if (prop.SetMethod == null || prop.GetMethod == null)
+                    return false;
+                if (typeof(Delegate).IsAssignableFrom(prop.PropertyType))
+                    return false;
+            }
+
+            if (!IsValidXElementName(member.Name))
+                return false;
+
+            if (member.IsDefined(typeof(CompilerGeneratedAttribute)))
+                return false;
+            return !member.IsDefined(typeof(XConvertIgnoreAttribute));
+        }
 
         #region Object To XElement
 
@@ -194,7 +225,7 @@ namespace ShuHai.XConverts
             return true;
         }
 
-        private static void ArgOrDefault(ref XConvertSettings settings)
+        internal static void ArgOrDefault(ref XConvertSettings settings)
         {
             if (settings == null)
                 settings = XConvertSettings.Default;

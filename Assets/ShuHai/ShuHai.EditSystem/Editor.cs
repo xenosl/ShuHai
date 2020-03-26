@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using ShuHai.XConverts;
 
 namespace ShuHai.EditSystem
@@ -10,6 +9,8 @@ namespace ShuHai.EditSystem
 
     public class Editor
     {
+        public string Name = typeof(Editor).Name;
+        
         #region Objects
 
         public event Action<EditorObject> ObjectAdded;
@@ -19,8 +20,8 @@ namespace ShuHai.EditSystem
 
         public EditorObject AddObject(object rawObject)
         {
-            var obj = new EditorObject(_nextObjectOrder++, rawObject);
-            AddObject(obj);
+            var obj = new EditorObject(rawObject);
+            AddObject(obj, _nextObjectOrder++);
             return obj;
         }
 
@@ -33,12 +34,12 @@ namespace ShuHai.EditSystem
         public EditorObject GetObject(int order) { return _objects.TryGetValue(order, out var obj) ? obj : null; }
 
         [XConvertMember("Objects")]
-        private Dictionary<int, EditorObject> _objects = new Dictionary<int, EditorObject>();
+        private readonly Dictionary<int, EditorObject> _objects = new Dictionary<int, EditorObject>();
 
-        private void AddObject(EditorObject obj)
+        private void AddObject(EditorObject obj, int order)
         {
-            _objects.Add(obj.Order, obj);
-            obj.Owner = this;
+            _objects.Add(order, obj);
+            obj.OnAddToEditor(this, order);
 
             ObjectAdded?.Invoke(obj);
         }
@@ -50,7 +51,7 @@ namespace ShuHai.EditSystem
 
             ObjectRemoving?.Invoke(obj);
 
-            obj.Owner = null;
+            obj.OnRemoveFromEditor(this);
             _objects.Remove(order);
 
             return true;
@@ -63,7 +64,7 @@ namespace ShuHai.EditSystem
                 RemoveObject(id);
         }
 
-        [XConvertMember("NextObjectOrder")] private int _nextObjectOrder = 1;
+        private int _nextObjectOrder = 1;
 
         #endregion Objects
 

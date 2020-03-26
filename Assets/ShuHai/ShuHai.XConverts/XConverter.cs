@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -67,6 +66,7 @@ namespace ShuHai.XConverts
         public XElement ToXElement(object @object, string elementName, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNullOrEmpty(elementName, nameof(elementName));
+            XConvert.ArgOrDefault(ref settings);
             if (!CanConvert(@object))
                 throw new ArgumentException("Unable to convert object to xml element.", nameof(@object));
 
@@ -114,9 +114,10 @@ namespace ShuHai.XConverts
 
         #region XElement To Object
 
-        public object ToObject(XElement element, XConvertSettings settings)
+        public object ToObject(XElement element, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNull(element, nameof(element));
+            XConvert.ArgOrDefault(ref settings);
 
             var type = XConvert.ParseObjectType(element);
             if (type == null)
@@ -161,40 +162,10 @@ namespace ShuHai.XConverts
         protected virtual IReadOnlyList<MemberInfo> SelectConvertMembers(Type type)
         {
             return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(IsValidMember) // All valid members.
+                .Where(XConvert.CanConvert) // All valid members.
                 .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case.
                 .Select(g => g.OrderByDescending(m => m, MemberPriorityComparer.Instance).First())
                 .ToList();
-        }
-
-        private static bool IsValidMember(MemberInfo member)
-        {
-            var mt = member.MemberType;
-            if (mt != MemberTypes.Property && mt != MemberTypes.Field)
-                return false;
-
-            if (mt == MemberTypes.Field)
-            {
-                var field = (FieldInfo)member;
-                if (typeof(Delegate).IsAssignableFrom(field.FieldType))
-                    return false;
-            }
-
-            if (mt == MemberTypes.Property)
-            {
-                var prop = (PropertyInfo)member;
-                if (prop.SetMethod == null || prop.GetMethod == null)
-                    return false;
-                if (typeof(Delegate).IsAssignableFrom(prop.PropertyType))
-                    return false;
-            }
-
-            if (!XConvert.IsValidXElementName(member.Name))
-                return false;
-
-            if (member.IsDefined(typeof(CompilerGeneratedAttribute)))
-                return false;
-            return !member.IsDefined(typeof(XConvertIgnoreAttribute));
         }
 
         #endregion Object Members
