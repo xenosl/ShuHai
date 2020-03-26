@@ -202,44 +202,6 @@ namespace ShuHai
             return self.GetMethod(name, BindingAttributes.DeclareAll, null, parameterTypes, null);
         }
 
-        public static void SetMemberValue(this Type self,
-            string name, object target, object value, BindingFlags bindingAttr = BindingAttributes.DeclareAll)
-        {
-            Ensure.Argument.NotNull(self, nameof(self));
-
-            var prop = self.GetProperty(name, bindingAttr);
-            if (prop != null)
-            {
-                prop.SetValue(target, value);
-                return;
-            }
-
-            var field = self.GetField(name, bindingAttr);
-            if (field != null)
-            {
-                field.SetValue(target, value);
-                return;
-            }
-
-            throw new InvalidOperationException("Member of specified name is not a property or field.");
-        }
-
-        public static object GetMemberValue(this Type self,
-            string name, object target, BindingFlags bindingAttr = BindingAttributes.DeclareAll)
-        {
-            Ensure.Argument.NotNull(self, nameof(self));
-
-            var prop = self.GetProperty(name, bindingAttr);
-            if (prop != null)
-                return prop.GetValue(target);
-
-            var field = self.GetField(name, bindingAttr);
-            if (field != null)
-                return field.GetValue(target);
-
-            throw new InvalidOperationException("Member of specified name is not a property or field.");
-        }
-
         #endregion Member Getters
 
         #region Related Type Enumeration
