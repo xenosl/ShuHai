@@ -6,11 +6,13 @@ namespace ShuHai.Reflection
 {
     public sealed class AssignableMember
     {
-        public MemberInfo Member { get; }
+        public MemberInfo Info { get; }
+
+        public bool IsStatic => Info.IsStatic();
 
         public void SetValue(object target, object value)
         {
-            switch (Member)
+            switch (Info)
             {
                 case FieldInfo field:
                     field.SetValue(target, value);
@@ -25,7 +27,7 @@ namespace ShuHai.Reflection
 
         public object GetValue(object target)
         {
-            switch (Member)
+            switch (Info)
             {
                 case FieldInfo field:
                     return field.GetValue(target);
@@ -36,7 +38,7 @@ namespace ShuHai.Reflection
             }
         }
 
-        private AssignableMember(MemberInfo member) { Member = member; }
+        private AssignableMember(MemberInfo info) { Info = info; }
 
         #region Instances
 
@@ -52,21 +54,21 @@ namespace ShuHai.Reflection
             return null;
         }
 
-        public static AssignableMember Get(MemberInfo member)
+        public static AssignableMember Get(MemberInfo info)
         {
-            Ensure.Argument.NotNull(member, nameof(member));
+            Ensure.Argument.NotNull(info, nameof(info));
 
-            var mt = member.MemberType;
+            var mt = info.MemberType;
             if (mt != MemberTypes.Field && mt != MemberTypes.Property)
             {
                 throw new ArgumentException(
-                    "Only field or property is considered as assignable member.", nameof(member));
+                    "Only field or property is considered as assignable member.", nameof(info));
             }
 
-            if (!_instances.TryGetValue(member, out var am))
+            if (!_instances.TryGetValue(info, out var am))
             {
-                am = new AssignableMember(member);
-                _instances.Add(member, am);
+                am = new AssignableMember(info);
+                _instances.Add(info, am);
             }
             return am;
         }
