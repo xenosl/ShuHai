@@ -23,6 +23,8 @@ namespace ShuHai.EditSystem
         [XConvertIgnore]
         public Editor Owner { get; private set; }
 
+        public bool IsValid => Owner != null;
+
         internal void OnAddToEditor(Editor editor, int order)
         {
             Debug.Assert(Owner == null);

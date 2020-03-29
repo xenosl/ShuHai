@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using ShuHai.XConverts;
 
 namespace ShuHai.EditSystem
@@ -10,7 +11,7 @@ namespace ShuHai.EditSystem
     public class Editor
     {
         public string Name = typeof(Editor).Name;
-        
+
         #region Objects
 
         public event Action<EditorObject> ObjectAdded;

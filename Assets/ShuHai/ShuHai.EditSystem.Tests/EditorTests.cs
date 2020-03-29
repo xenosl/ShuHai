@@ -19,7 +19,7 @@ namespace ShuHai.EditSystem.Tests
 
             var converter = new EditorConverter();
             var element = converter.ToXElement(editor, "EditorConvert");
-            //var editorFromElement = XConvert.ToObject(element);
+            var editorFromElement = converter.ToObject(element);
         }
     }
 }

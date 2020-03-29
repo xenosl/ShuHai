@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters;
 using System.Xml;
 using System.Xml.Linq;
+using ShuHai.Reflection;
 
 namespace ShuHai.XConverts
 {
@@ -49,6 +50,22 @@ namespace ShuHai.XConverts
             ArgOrDefault(ref settings);
 
             return ToXElementImpl(@object, null, elementName, settings);
+        }
+
+        public static XElement ToXElement(Type type, string memberName,
+            BindingFlags bindingAttr, object target, XConvertSettings settings = null)
+        {
+            Ensure.Argument.NotNull(type, nameof(type));
+            Ensure.Argument.NotNullOrEmpty(memberName, nameof(memberName));
+
+            var am = AssignableMember.Get(type, memberName, bindingAttr);
+            if (am == null)
+                throw new MissingMemberException($"Member '{memberName}' of type '{type}' not found.");
+
+            if (!am.IsStatic)
+                Ensure.Argument.NotNull(target, nameof(target));
+
+            return ToXElement(am.Info, target, settings);
         }
 
         public static XElement ToXElement(MemberInfo member, object target, XConvertSettings settings = null)
@@ -112,6 +129,17 @@ namespace ShuHai.XConverts
 
             var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, type);
             return converter.ToObject(element, settings);
+        }
+
+        public static bool SetValue(Type type, string memberName, BindingFlags bindingAttr, object target,
+            XElement element, XConvertSettings settings = null)
+        {
+            var am = AssignableMember.Get(type, memberName, bindingAttr);
+            if (am == null)
+                throw new MissingMemberException($"Member '{memberName}' of type '{type}' not found.");
+            
+
+            throw new NotImplementedException();
         }
 
         public static bool SetValue(this MemberInfo member,

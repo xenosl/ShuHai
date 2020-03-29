@@ -163,7 +163,7 @@ namespace ShuHai.XConverts
         {
             return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .Where(XConvert.CanConvert) // All valid members.
-                .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case.
+                .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case. (Merge similar members)
                 .Select(g => g.OrderByDescending(m => m, MemberPriorityComparer.Instance).First())
                 .ToList();
         }
@@ -177,7 +177,7 @@ namespace ShuHai.XConverts
         /// </summary>
         public static readonly IReadOnlyXConverterCollection BuiltIns;
 
-        private static IReadOnlyXConverterCollection InitializeBuiltIns()
+        private static IReadOnlyXConverterCollection CollectBuiltIns()
         {
             var rootType = typeof(XConverter);
             var converters = rootType.Assembly.GetTypes()
@@ -192,6 +192,6 @@ namespace ShuHai.XConverts
 
         #endregion Built-in Instances
 
-        static XConverter() { BuiltIns = InitializeBuiltIns(); }
+        static XConverter() { BuiltIns = CollectBuiltIns(); }
     }
 }
