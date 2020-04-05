@@ -8,9 +8,43 @@ namespace ShuHai.Reflection
     {
         public MemberInfo Info { get; }
 
+        public Type ValueType { get; }
+
         public string Name => Info.Name;
 
         public bool IsStatic => Info.IsStatic();
+
+        public bool CanSetValue
+        {
+            get
+            {
+                switch (Info)
+                {
+                    case FieldInfo _:
+                        return true;
+                    case PropertyInfo prop:
+                        return prop.SetMethod != null;
+                    default:
+                        throw new InvalidReferenceException();
+                }
+            }
+        }
+
+        public bool CanGetValue
+        {
+            get
+            {
+                switch (Info)
+                {
+                    case FieldInfo _:
+                        return true;
+                    case PropertyInfo prop:
+                        return prop.GetMethod != null;
+                    default:
+                        throw new InvalidReferenceException();
+                }
+            }
+        }
 
         public void SetValue(object target, object value)
         {
@@ -40,7 +74,11 @@ namespace ShuHai.Reflection
             }
         }
 
-        protected AssignableMember(MemberInfo info) { Info = info; }
+        protected AssignableMember(MemberInfo info)
+        {
+            Info = info;
+            ValueType = ValueTypeOf(Info);
+        }
 
         public static MemberInfo GetInfo(Type type, string memberName,
             BindingFlags bindingAttr = BindingAttributes.DeclareAll)
@@ -55,6 +93,21 @@ namespace ShuHai.Reflection
             if (field != null)
                 return field;
             return null;
+        }
+
+        public static Type ValueTypeOf(MemberInfo info)
+        {
+            Ensure.Argument.NotNull(info, nameof(info));
+
+            switch (info)
+            {
+                case FieldInfo field:
+                    return field.FieldType;
+                case PropertyInfo prop:
+                    return prop.PropertyType;
+                default:
+                    throw new ArgumentException("Field or property expected.", nameof(info));
+            }
         }
 
         #region Instances

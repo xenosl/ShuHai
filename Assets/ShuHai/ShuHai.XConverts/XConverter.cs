@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
+using ShuHai.Reflection;
 
 namespace ShuHai.XConverts
 {
@@ -107,7 +108,7 @@ namespace ShuHai.XConverts
         {
             var type = @object.GetType();
             foreach (var member in SelectConvertMembers(type))
-                element.Add(member.ToElement(@object, settings));
+                element.Add(member.ToXElement(@object, settings));
         }
 
         #endregion Object To XElement
@@ -159,11 +160,11 @@ namespace ShuHai.XConverts
 
         #region Object Members
 
-        protected virtual IReadOnlyList<XConvertMember> SelectConvertMembers(Type type)
+        protected virtual IReadOnlyList<AssignableMember> SelectConvertMembers(Type type)
         {
             return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Select(m => XConvertMember.Get(m, false))
-                .Where(m => m != null) // All valid members.
+                .Where(XConvert.CanConvert) // All valid members.
+                .Select(AssignableMember.Get) // To assignment members.
                 .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case. (Merge similar members)
                 .Select(g => g.OrderByDescending(m => m, XConvertMemberPriorityComparer.Instance).First())
                 .ToList();

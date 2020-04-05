@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using ShuHai.Reflection;
 
 namespace ShuHai.XConverts
 {
-    public class XConvertMemberPriorityComparer : IComparer<XConvertMember>
+    public class XConvertMemberPriorityComparer : IComparer<AssignableMember>
     {
         public static readonly XConvertMemberPriorityComparer Instance = new XConvertMemberPriorityComparer();
 
-        public int Compare(XConvertMember l, XConvertMember r)
+        public int Compare(AssignableMember l, AssignableMember r)
         {
             if (l == r)
                 return 0;

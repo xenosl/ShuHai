@@ -4,7 +4,7 @@ using System.Xml.Linq;
 namespace ShuHai.XConverts.Converters
 {
     /// <summary>
-    ///     Abstract converter for all types that doesn't need any child.
+    ///     Abstract converter for all types that doesn't need any child xml element.
     /// </summary>
     public abstract class ValueConverter : XConverter
     {

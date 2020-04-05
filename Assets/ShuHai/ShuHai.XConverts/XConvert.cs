@@ -46,7 +46,7 @@ namespace ShuHai.XConverts
 
         #region Object To XElement
 
-        public static XElement ToXElement(object @object, string elementName, XConvertSettings settings = null)
+        public static XElement ToXElement(this object @object, string elementName, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNullOrEmpty(elementName, nameof(elementName));
             ArgOrDefault(ref settings);
@@ -70,7 +70,7 @@ namespace ShuHai.XConverts
             return ToXElement(am.Info, target, settings);
         }
 
-        public static XElement ToXElement(MemberInfo member, object target, XConvertSettings settings = null)
+        public static XElement ToXElement(this MemberInfo member, object target, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNull(member, nameof(member));
 
@@ -85,7 +85,7 @@ namespace ShuHai.XConverts
             }
         }
 
-        public static XElement ToXElement(FieldInfo field, object target, XConvertSettings settings = null)
+        public static XElement ToXElement(this FieldInfo field, object target, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNull(field, nameof(field));
             if (!field.IsStatic)
@@ -96,7 +96,7 @@ namespace ShuHai.XConverts
             return ToXElementImpl(value, field.FieldType, XElementNameOf(field), settings);
         }
 
-        public static XElement ToXElement(PropertyInfo property, object target, XConvertSettings settings = null)
+        public static XElement ToXElement(this PropertyInfo property, object target, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNull(property, nameof(property));
             var getMethod = property.GetMethod;
@@ -107,6 +107,15 @@ namespace ShuHai.XConverts
 
             var value = property.GetValue(target);
             return ToXElementImpl(value, property.PropertyType, XElementNameOf(property), settings);
+        }
+
+        public static XElement ToXElement(this AssignableMember member, object target, XConvertSettings settings = null)
+        {
+            Ensure.Argument.NotNull(member, nameof(member));
+            ArgOrDefault(ref settings);
+
+            var value = member.GetValue(target);
+            return ToXElementImpl(value, member.ValueType, XElementNameOf(member.Info), settings);
         }
 
         private static XElement ToXElementImpl(
@@ -120,7 +129,7 @@ namespace ShuHai.XConverts
 
         #region XElement To Object
 
-        public static object ToObject(XElement element, XConvertSettings settings = null)
+        public static object ToObject(this XElement element, XConvertSettings settings = null)
         {
             Ensure.Argument.NotNull(element, nameof(element));
             ArgOrDefault(ref settings);
@@ -166,7 +175,23 @@ namespace ShuHai.XConverts
             Ensure.Argument.NotNull(element, nameof(element));
             ArgOrDefault(ref settings);
 
+            if (property.SetMethod == null)
+                return false;
+
             return SetValueImpl(property.SetValue, target, property.PropertyType, element, settings);
+        }
+
+        public static bool SetValue(this AssignableMember member,
+            object target, XElement element, XConvertSettings settings = null)
+        {
+            Ensure.Argument.NotNull(member, nameof(member));
+            Ensure.Argument.NotNull(element, nameof(element));
+            ArgOrDefault(ref settings);
+
+            if (!member.CanSetValue)
+                return false;
+
+            return SetValueImpl(member.SetValue, target, member.ValueType, element, settings);
         }
 
         private static bool SetValueImpl(Action<object, object> valueSetter,
