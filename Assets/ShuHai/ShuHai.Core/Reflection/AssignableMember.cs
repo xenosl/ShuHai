@@ -4,9 +4,11 @@ using System.Reflection;
 
 namespace ShuHai.Reflection
 {
-    public sealed class AssignableMember
+    public class AssignableMember
     {
         public MemberInfo Info { get; }
+
+        public string Name => Info.Name;
 
         public bool IsStatic => Info.IsStatic();
 
@@ -38,20 +40,29 @@ namespace ShuHai.Reflection
             }
         }
 
-        private AssignableMember(MemberInfo info) { Info = info; }
+        protected AssignableMember(MemberInfo info) { Info = info; }
+
+        public static MemberInfo GetInfo(Type type, string memberName,
+            BindingFlags bindingAttr = BindingAttributes.DeclareAll)
+        {
+            Ensure.Argument.NotNull(type, nameof(type));
+            Ensure.Argument.NotNullOrEmpty(memberName, nameof(memberName));
+
+            var prop = type.GetProperty(memberName, bindingAttr);
+            if (prop != null)
+                return prop;
+            var field = type.GetField(memberName, bindingAttr);
+            if (field != null)
+                return field;
+            return null;
+        }
 
         #region Instances
 
         public static AssignableMember Get(Type type, string memberName,
             BindingFlags bindingAttr = BindingAttributes.DeclareAll)
         {
-            var prop = type.GetProperty(memberName, bindingAttr);
-            if (prop != null)
-                return Get(prop);
-            var field = type.GetField(memberName, bindingAttr);
-            if (field != null)
-                return Get(field);
-            return null;
+            return Get(GetInfo(type, memberName, bindingAttr));
         }
 
         public static AssignableMember Get(MemberInfo info)

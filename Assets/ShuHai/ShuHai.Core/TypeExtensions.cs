@@ -85,10 +85,22 @@ namespace ShuHai
             return interfaces.Except(interfaces.SelectMany(t => t.GetInterfaces())).ToArray();
         }
 
+        #region Member Getters
+
         public static ConstructorInfo GetDefaultConstructor(this Type self)
         {
+            Ensure.Argument.NotNull(self, nameof(self));
             return self.GetConstructor(BindingAttributes.DeclareInstance, null, Type.EmptyTypes, null);
         }
+
+        public static MethodInfo GetMethod(this Type self,
+            string name, BindingFlags bindingAttr, Type[] types)
+        {
+            Ensure.Argument.NotNull(self, nameof(self));
+            return self.GetMethod(name, bindingAttr, null, types, null);
+        }
+
+        #endregion Member Getters
 
         #region Related Type Enumeration
 

@@ -2,6 +2,9 @@ using System.Reflection;
 
 namespace ShuHai
 {
+    /// <summary>
+    ///     Provides shortcuts of frequently used <see cref="BindingFlags" /> combinations.
+    /// </summary>
     public static class BindingAttributes
     {
         public const BindingFlags DeclareInstance = BindingFlags.DeclaredOnly
