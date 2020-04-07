@@ -9,7 +9,6 @@ namespace ShuHai.EditSystem
         /// <summary>
         ///     Creation order of current object.
         /// </summary>
-        [XConvertIgnore]
         public int Order { get; private set; }
 
         public string Name;

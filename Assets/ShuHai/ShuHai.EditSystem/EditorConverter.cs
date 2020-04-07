@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using ShuHai.Reflection;
 using ShuHai.XConverts;
 
 namespace ShuHai.EditSystem
@@ -15,8 +16,9 @@ namespace ShuHai.EditSystem
 
         protected override void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
+            var type = @object.GetType();
             var editor = (Editor)@object;
-            element.Add(new XElement(MemberNames.Name, editor.Name));
+            element.Add(AssignableMember.Get(type, MemberNames.Name).ToXElement(@object, settings));
             element.Add(ObjectsToXElement(editor, settings));
         }
 
@@ -26,8 +28,8 @@ namespace ShuHai.EditSystem
             var root = new XElement(XConvert.XElementNameOf(member));
             foreach (var obj in editor.Objects)
             {
-                var childElement = XConvert.ToXElement(obj, typeof(EditorObject).Name, settings);
-                childElement.Add(XConvert.ToXElement(obj.Value, "Value", settings));
+                var childElement = obj.ToXElement(typeof(EditorObject).Name, settings);
+                childElement.Add(obj.Value.ToXElement("Value", settings));
                 root.Add(childElement);
             }
             return root;
@@ -36,22 +38,20 @@ namespace ShuHai.EditSystem
         protected override void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
             var editor = (Editor)@object;
-            var type = editor.GetType();
-
             editor.Name = element.Element(MemberNames.Name)?.Value;
-
-            var member = type.GetField(MemberNames.Objects, BindingAttributes.DeclareInstance);
-            var root = element.Element(XConvert.XElementNameOf(member));
-            PopulateObjects(editor, root, settings);
+            PopulateObjects(editor, element, settings);
         }
 
-        private void PopulateObjects(Editor editor, XElement root, XConvertSettings settings)
+        private void PopulateObjects(Editor editor, XElement element, XConvertSettings settings)
         {
             var type = editor.GetType();
-            var addObjectMethod = type.GetMethod(MemberNames.AddObject, new[] { typeof(EditorObject), typeof(int) });
+            var member = type.GetField(MemberNames.Objects, BindingAttributes.DeclareInstance);
+            var root = element.Element(XConvert.XElementNameOf(member));
+            var addObjectMethod = type.GetMethod(MemberNames.AddObject,
+                BindingAttributes.DeclareInstance, new[] { typeof(EditorObject), typeof(int) });
             foreach (var objectElement in root.Elements())
             {
-                var eo = (EditorObject)XConvert.ToObject(objectElement, settings);
+                var eo = (EditorObject)objectElement.ToObject(settings);
                 addObjectMethod.Invoke(editor, new object[] { eo, eo.Order });
             }
         }
