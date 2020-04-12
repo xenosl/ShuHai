@@ -1,15 +1,18 @@
 {
-    "name": "ShuHai.EditSystem",
+    "name": "ShuHai.Edit.Tests",
     "references": [
         "GUID:2f3f35f1347586048b0a7c361332f826",
+        "GUID:7b2d049b63e2341ad85a19f8e527a001",
         "GUID:c282b176cb4a84205a266bf62359eff5"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": true
