@@ -14,6 +14,8 @@ namespace ShuHai.EditSystem
             public const string AddObject = "AddObject";
         }
 
+        #region Object To XElement
+
         protected override void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
             var type = @object.GetType();
@@ -29,11 +31,15 @@ namespace ShuHai.EditSystem
             foreach (var obj in editor.Objects)
             {
                 var childElement = obj.ToXElement(typeof(EditorObject).Name, settings);
-                childElement.Add(obj.Value.ToXElement("Value", settings));
+                childElement.SetAttributeValue("Order", obj.Order);
                 root.Add(childElement);
             }
             return root;
         }
+
+        #endregion Object To XElement
+
+        #region XElement To Object
 
         protected override void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
@@ -46,14 +52,18 @@ namespace ShuHai.EditSystem
         {
             var type = editor.GetType();
             var member = type.GetField(MemberNames.Objects, BindingAttributes.DeclareInstance);
-            var root = element.Element(XConvert.XElementNameOf(member));
             var addObjectMethod = type.GetMethod(MemberNames.AddObject,
                 BindingAttributes.DeclareInstance, new[] { typeof(EditorObject), typeof(int) });
+
+            var root = element.Element(XConvert.XElementNameOf(member));
             foreach (var objectElement in root.Elements())
             {
+                var order = int.Parse(objectElement.Attribute("Order").Value);
                 var eo = (EditorObject)objectElement.ToObject(settings);
-                addObjectMethod.Invoke(editor, new object[] { eo, eo.Order });
+                addObjectMethod.Invoke(editor, new object[] { eo, order });
             }
         }
+
+        #endregion XElement To Object
     }
 }

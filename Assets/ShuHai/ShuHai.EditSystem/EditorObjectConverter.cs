@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 using ShuHai.Reflection;
 using ShuHai.XConverts;
@@ -14,12 +15,12 @@ namespace ShuHai.EditSystem
         {
             public static readonly MemberNames Instance = new MemberNames();
 
-            public const string Order = "Order";
+            public const string Name = "Name";
             public const string Value = "Value";
 
             public IEnumerator<string> GetEnumerator()
             {
-                yield return Order;
+                yield return Name;
                 yield return Value;
             }
 
@@ -32,7 +33,7 @@ namespace ShuHai.EditSystem
         {
             var type = @object.GetType();
             foreach (var name in MemberNames.Instance)
-                element.Add(AssignableMember.Get(type, name).ToXElement(@object, settings));
+                element.SetChild(type, name, @object, settings);
         }
 
         #endregion Object To XElement
@@ -48,7 +49,13 @@ namespace ShuHai.EditSystem
 
         protected override void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
-            base.PopulateObjectMembers(@object, element, settings);
+            var type = @object.GetType();
+            foreach (var name in MemberNames.Instance.Where(n => n != MemberNames.Value))
+            {
+                var am = AssignableMember.Get(type, name);
+                var childElement = element.Element(XConvert.XElementNameOf(am.Info));
+                am.SetValue(@object, childElement, settings);
+            }
         }
 
         #endregion XElement To Object

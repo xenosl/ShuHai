@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using ShuHai.XConverts;
 
@@ -26,7 +27,8 @@ namespace ShuHai.EditSystem.Tests
             };
 
             var element = editor.ToXElement("EditorConvert", settings);
-            var editorFromElement = element.ToObject(settings);
+            var editorFromElement = (Editor)element.ToObject(settings);
+            CollectionAssert.AreEqual(objects.Select(o => o.Value), editorFromElement.Objects.Select(o => o.Value));
         }
     }
 }
