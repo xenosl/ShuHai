@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
-using ShuHai.Reflection;
 
 namespace ShuHai.XConverts
 {
@@ -107,7 +105,7 @@ namespace ShuHai.XConverts
         protected virtual void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
             var type = @object.GetType();
-            foreach (var member in SelectConvertMembers(type))
+            foreach (var member in XConvert.CollectConvertMembers(type))
                 element.Add(member.ToXElement(@object, settings));
         }
 
@@ -148,7 +146,7 @@ namespace ShuHai.XConverts
         /// </param>
         protected virtual void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
-            var memberDict = SelectConvertMembers(@object.GetType()).ToDictionary(m => m.Name);
+            var memberDict = XConvert.CollectConvertMembers(@object.GetType()).ToDictionary(m => m.Name);
             foreach (var childElement in element.Elements())
             {
                 if (memberDict.TryGetValue(childElement.Name.LocalName, out var member))
@@ -157,20 +155,6 @@ namespace ShuHai.XConverts
         }
 
         #endregion XElement To Object
-
-        #region Object Members
-
-        protected virtual IReadOnlyList<AssignableMember> SelectConvertMembers(Type type)
-        {
-            return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(XConvert.CanConvert) // All valid members.
-                .Select(AssignableMember.Get) // To assignment members.
-                .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case. (Merge similar members)
-                .Select(g => g.OrderByDescending(m => m, XConvertMemberPriorityComparer.Instance).First())
-                .ToList();
-        }
-
-        #endregion Object Members
 
         #region Built-in Instances
 

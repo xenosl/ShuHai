@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters;
@@ -123,6 +125,28 @@ namespace ShuHai.XConverts
         {
             var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, @object, fallbackType);
             return converter.ToXElement(@object, elementName, settings);
+        }
+
+        /// <summary>
+        ///     Get or add the child xml element corresponding to the assignment member specified by arguments.
+        /// </summary>
+        public static void SetChild(this XElement element,
+            Type type, string memberName, object target, XConvertSettings settings = null)
+        {
+            Ensure.Argument.NotNull(element, nameof(element));
+            Ensure.Argument.NotNull(type, nameof(type));
+            Ensure.Argument.NotNullOrEmpty(memberName, nameof(memberName));
+
+            var am = AssignableMember.Get(type, memberName);
+            if (!am.CanGetValue)
+                throw new MissingMemberException($"Unable to get value from {type}.{memberName}.");
+
+            var childName = XElementNameOf(am.Info);
+            element.Element(childName)?.Remove();
+
+            var value = am.GetValue(target);
+            var child = value.ToXElement(childName, settings);
+            element.Add(child);
         }
 
         #endregion Object To XElement
@@ -267,6 +291,16 @@ namespace ShuHai.XConverts
                 return false;
             }
             return true;
+        }
+
+        public static IReadOnlyList<AssignableMember> CollectConvertMembers(Type type)
+        {
+            return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(XConvert.CanConvert) // All valid members.
+                .Select(AssignableMember.Get) // To assignment members.
+                .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case. (Merge similar members)
+                .Select(g => g.OrderByDescending(m => m, XConvertMemberPriorityComparer.Instance).First())
+                .ToList();
         }
 
         internal static void ArgOrDefault(ref XConvertSettings settings)
