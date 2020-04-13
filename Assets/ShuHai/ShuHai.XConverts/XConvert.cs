@@ -46,6 +46,16 @@ namespace ShuHai.XConverts
             return !member.IsDefined(typeof(XConvertIgnoreAttribute));
         }
 
+        public static IReadOnlyList<AssignableMember> CollectConvertMembers(Type type)
+        {
+            return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(XConvert.CanConvert) // All valid members.
+                .Select(AssignableMember.Get) // To assignment members.
+                .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case. (Merge similar members)
+                .Select(g => g.OrderByDescending(m => m, XConvertMemberPriorityComparer.Instance).First())
+                .ToList();
+        }
+
         #region Object To XElement
 
         public static XElement ToXElement(this object @object, string elementName, XConvertSettings settings = null)
@@ -291,16 +301,6 @@ namespace ShuHai.XConverts
                 return false;
             }
             return true;
-        }
-
-        public static IReadOnlyList<AssignableMember> CollectConvertMembers(Type type)
-        {
-            return type.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(XConvert.CanConvert) // All valid members.
-                .Select(AssignableMember.Get) // To assignment members.
-                .GroupBy(m => m.Name.ToLower()) // Group by member name ignore case. (Merge similar members)
-                .Select(g => g.OrderByDescending(m => m, XConvertMemberPriorityComparer.Instance).First())
-                .ToList();
         }
 
         internal static void ArgOrDefault(ref XConvertSettings settings)

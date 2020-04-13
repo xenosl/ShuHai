@@ -10,6 +10,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(ICollection<>))]
     public class CollectionConverter : XConverter
     {
+        #region Object To XElement
+
         protected override void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
             var itemType = ItemTypeOf(@object);
@@ -22,22 +24,44 @@ namespace ShuHai.XConverts.Converters
             }
         }
 
+        #endregion Object To XElement
+
+        #region XElement To Object
+
+        protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
+        {
+            return type.IsArray
+                ? Array.CreateInstance(type.GetElementType(), element.Elements().Count())
+                : base.CreateObject(element, type, settings);
+        }
+
         protected override void PopulateObjectMembers(object @object, XElement element, XConvertSettings settings)
         {
-            var type = CollectionTypeOf(@object);
-            var addMethod = type.GetMethod("Add", new[] { ItemTypeOf(type) });
-            foreach (var childElement in element.Elements())
+            var type = @object.GetType();
+            if (type.IsArray)
             {
-                var itemType = XConvert.ParseObjectType(childElement);
-                object item = null;
-                if (itemType != null)
-                {
-                    var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, itemType);
-                    item = converter.ToObject(childElement, settings);
-                }
-                addMethod.Invoke(@object, new[] { item });
+                var array = (Array)@object;
+                int index = 0;
+                foreach (var item in ChildrenToObjects(element, settings))
+                    array.SetValue(item, index++);
+            }
+            else
+            {
+                var collectionType = CollectionTypeOf(@object);
+                var addMethod = collectionType.GetMethod("Add", new[] { ItemTypeOf(collectionType) });
+                foreach (var item in ChildrenToObjects(element, settings))
+                    addMethod.Invoke(@object, new[] { item });
             }
         }
+
+        private static IEnumerable<object> ChildrenToObjects(XElement element, XConvertSettings settings)
+        {
+            return element.Elements().Select(e => e.ToObject(settings));
+        }
+
+        #endregion XElement To Object
+
+        #region Utilities
 
         /// <summary>
         ///     Get the actual item type of the specified collection object.
@@ -58,5 +82,7 @@ namespace ShuHai.XConverts.Converters
             return @object.GetType().GetInterfaces()
                 .First(t => t.IsGenericType && t.GetGenericTypeDefinition() == ConvertType);
         }
+
+        #endregion Utilities
     }
 }

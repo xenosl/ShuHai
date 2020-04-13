@@ -87,10 +87,12 @@ namespace ShuHai.XConverts
             var c0 = new HashSet<string>();
             var c1 = new List<object> { 978.44, Guid.NewGuid() };
             var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, float.MaxValue }, { 4, c1 } };
+            var c3 = new object[] { 22, "string" };
 
             ConvertTest(c, c0);
             ConvertTest(c, c1);
             ConvertTest(c, c2, SettingsForByteValues);
+            ConvertTest(c, c3);
         }
 
         [Test]
