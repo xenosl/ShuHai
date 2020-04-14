@@ -271,15 +271,15 @@ namespace ShuHai.XConverts
 
         public static Type ParseObjectType(XElement element)
         {
-            var typeAttr = element.Attribute(TypeAttributeName);
-            if (typeAttr == null)
+            var attr = element.Attribute(TypeAttributeName);
+            if (attr == null)
                 return null;
-            if (typeAttr.Value == NullTypeName)
+            if (attr.Value == NullTypeName)
                 return null;
 
-            var type = TypeCache.GetType(typeAttr.Value);
+            var type = TypeCache.GetType(attr.Value);
             if (type == null)
-                throw new XmlException($@"Failed to load type ""{typeAttr.Value}"".");
+                throw new XmlException($@"Failed to load type ""{attr.Value}"".");
 
             return type;
         }

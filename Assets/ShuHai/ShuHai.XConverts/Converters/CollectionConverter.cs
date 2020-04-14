@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace ShuHai.XConverts.Converters
@@ -11,6 +12,15 @@ namespace ShuHai.XConverts.Converters
     public class CollectionConverter : XConverter
     {
         #region Object To XElement
+
+        protected override void PopulateXAttributes(XElement element, object @object, XConvertSettings settings)
+        {
+            base.PopulateXAttributes(element, @object, settings);
+
+            if (@object.GetType().IsArray)
+                WriteArrayLengths(element, (Array)@object);
+        }
+
 
         protected override void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
@@ -31,7 +41,7 @@ namespace ShuHai.XConverts.Converters
         protected override object CreateObject(XElement element, Type type, XConvertSettings settings)
         {
             return type.IsArray
-                ? Array.CreateInstance(type.GetElementType(), element.Elements().Count())
+                ? Array.CreateInstance(type.GetElementType(), ParseArrayLengths(element))
                 : base.CreateObject(element, type, settings);
         }
 
@@ -81,6 +91,27 @@ namespace ShuHai.XConverts.Converters
         {
             return @object.GetType().GetInterfaces()
                 .First(t => t.IsGenericType && t.GetGenericTypeDefinition() == ConvertType);
+        }
+
+        private const string ArrayLengthsAttributeName = "Lengths";
+
+        private static void WriteArrayLengths(XElement element, Array array)
+        {
+            element.SetAttributeValue(ArrayLengthsAttributeName, string.Join(",", EnumerateArrayLength(array)));
+        }
+
+        private static IEnumerable<int> EnumerateArrayLength(Array array)
+        {
+            for (int i = 0; i < array.Rank; ++i)
+                yield return array.GetLength(i);
+        }
+
+        private static int[] ParseArrayLengths(XElement element)
+        {
+            var attr = element.Attribute(ArrayLengthsAttributeName);
+            if (attr == null)
+                throw new XmlException($"Attribute '{ArrayLengthsAttributeName}' not found.");
+            return attr.Value.Split(',').Select(int.Parse).ToArray();
         }
 
         #endregion Utilities

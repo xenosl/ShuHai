@@ -88,11 +88,13 @@ namespace ShuHai.XConverts
             var c1 = new List<object> { 978.44, Guid.NewGuid() };
             var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, float.MaxValue }, { 4, c1 } };
             var c3 = new object[] { 22, "string" };
+            //var c4 = new object[,] { { 33, "str", 'c' }, { 2212, 23.3f, Guid.NewGuid() } };
 
             ConvertTest(c, c0);
             ConvertTest(c, c1);
             ConvertTest(c, c2, SettingsForByteValues);
             ConvertTest(c, c3);
+            //ConvertTest(c, c4);
         }
 
         [Test]
@@ -102,6 +104,18 @@ namespace ShuHai.XConverts
             ConvertTest(c, Guid.Empty);
             ConvertTest(c, Guid.NewGuid());
             ConvertTest(c, Guid.NewGuid());
+        }
+
+        [Test]
+        public void DateTimeConvert()
+        {
+            var c = XConverter.BuiltIns[typeof(DateTime)];
+            ConvertTest(c, new DateTime());
+            ConvertTest(c, DateTime.Now);
+            ConvertTest(c, DateTime.UtcNow);
+            ConvertTest(c, DateTime.Today);
+            ConvertTest(c, DateTime.MinValue);
+            ConvertTest(c, DateTime.MaxValue);
         }
 
         public static void ConvertTest(XConverter converter, object value, XConvertSettings settings = null)
