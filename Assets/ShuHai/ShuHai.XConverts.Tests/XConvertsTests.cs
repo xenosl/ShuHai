@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using NUnit.Framework;
 using ShuHai.XConverts.Converters;
 
@@ -78,6 +79,18 @@ namespace ShuHai.XConverts
             ConvertTest(c, null);
             ConvertTest(c, string.Empty);
             ConvertTest(c, "This is a string.");
+        }
+
+        [Test]
+        public void DecimalConvert()
+        {
+            var c = XConverter.BuiltIns[typeof(decimal)];
+            ConvertTest(c, 12.23m);
+            ConvertTest(c, decimal.MinValue);
+            ConvertTest(c, decimal.MaxValue);
+            ConvertTest(c, decimal.MinusOne);
+            ConvertTest(c, decimal.Zero);
+            ConvertTest(c, decimal.One);
         }
 
         [Test]
