@@ -22,8 +22,8 @@ namespace ShuHai.Unity
         }
 
         /// <summary>
-        ///     Find components of type <typeparamref name="T" /> that match specified condition
-        ///     <paramref name="match" /> in opened scenes.
+        ///     Find components of type <typeparamref name="T" /> that match specified condition <paramref name="match" />
+        ///     in opened scenes.
         /// </summary>
         /// <typeparam name="T"> Component type to search. </typeparam>
         /// <param name="match"> Condition to match. </param>

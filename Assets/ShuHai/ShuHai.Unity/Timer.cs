@@ -12,23 +12,23 @@ namespace ShuHai.Unity
 
         public bool Enabled
         {
-            get => enabled;
+            get => _enabled;
             set
             {
-                if (value == enabled)
+                if (value == _enabled)
                     return;
 
-                enabled = value;
+                _enabled = value;
 
-                if (enabled)
+                if (_enabled)
                 {
-                    update += Update;
-                    stopwatch.Start();
+                    _Update += Update;
+                    _stopwatch.Start();
                 }
                 else
                 {
-                    stopwatch.Reset();
-                    update -= Update;
+                    _stopwatch.Reset();
+                    _Update -= Update;
                 }
             }
         }
@@ -38,12 +38,12 @@ namespace ShuHai.Unity
         /// </summary>
         public double Interval
         {
-            get => interval;
+            get => _interval;
             set
             {
                 if (value <= 0)
                     throw new ArgumentException("Invalid value: " + value);
-                interval = value;
+                _interval = value;
             }
         }
 
@@ -62,13 +62,13 @@ namespace ShuHai.Unity
 
         public void Stop() { Enabled = false; }
 
-        private bool enabled;
-        private double interval;
-        private readonly Stopwatch stopwatch = new Stopwatch();
+        private bool _enabled;
+        private double _interval;
+        private readonly Stopwatch _stopwatch = new Stopwatch();
 
         private void Update()
         {
-            var elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds;
+            var elapsedSeconds = _stopwatch.Elapsed.TotalMilliseconds;
             if (elapsedSeconds < Interval)
                 return;
 
@@ -76,8 +76,8 @@ namespace ShuHai.Unity
 
             if (AutoReset)
             {
-                stopwatch.Reset();
-                stopwatch.Start();
+                _stopwatch.Reset();
+                _stopwatch.Start();
             }
             else
             {
@@ -85,14 +85,14 @@ namespace ShuHai.Unity
             }
         }
 
-        private static event Action update
+        private static event Action _Update
         {
             add
             {
 #if UNITY_EDITOR
                 Root.EditorUpdate += value;
 #else
-                Root.Updating += value;
+                Root.Update += value;
 #endif // UNITY_EDITOR
             }
             remove
@@ -100,7 +100,7 @@ namespace ShuHai.Unity
 #if UNITY_EDITOR
                 Root.EditorUpdate -= value;
 #else
-                Root.Updating -= value;
+                Root.Update -= value;
 #endif // UNITY_EDITOR
             }
         }

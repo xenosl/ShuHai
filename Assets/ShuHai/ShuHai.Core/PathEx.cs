@@ -12,11 +12,11 @@ namespace ShuHai
     public static class PathEx
     {
 #if UNITY_5_3_OR_NEWER
-        public static readonly char DirectorySeparatorChar = '/';
-        public static readonly char AltDirectorySeparatorChar = '\\';
+        public const char DirectorySeparatorChar = '/';
+        public const char AltDirectorySeparatorChar = '\\';
 #else
-        public static readonly char DirectorySeparatorChar = Path.DirectorySeparatorChar;
-        public static readonly char AltDirectorySeparatorChar = Path.AltDirectorySeparatorChar;
+        public const char DirectorySeparatorChar = Path.DirectorySeparatorChar;
+        public const char AltDirectorySeparatorChar = Path.AltDirectorySeparatorChar;
 #endif
 
         /// <summary>
@@ -65,6 +65,32 @@ namespace ShuHai
         }
 
         /// <summary>
+        ///     Similar to <see cref="System.IO.Path.Combine(string,string)" /> but returns normalized path.
+        /// </summary>
+        public static string Combine(string path1, string path2) { return Normalize(Path.Combine(path1, path2)); }
+
+        /// <summary>
+        ///     Similar to <see cref="System.IO.Path.Combine(string,string,string)" /> but returns normalized path.
+        /// </summary>
+        public static string Combine(string path1, string path2, string path3)
+        {
+            return Normalize(Path.Combine(path1, path2, path3));
+        }
+
+        /// <summary>
+        ///     Similar to <see cref="System.IO.Path.Combine(string,string,string,string)" /> but returns normalized path.
+        /// </summary>
+        public static string Combine(string path1, string path2, string path3, string path4)
+        {
+            return Normalize(Path.Combine(path1, path2, path3, path4));
+        }
+
+        /// <summary>
+        ///     Similar to <see cref="System.IO.Path.Combine(string[])" /> but returns normalized path.
+        /// </summary>
+        public static string Combine(params string[] path) { return Normalize(Path.Combine(path)); }
+
+        /// <summary>
         ///     Get the filename or directory name of the specified path string.
         /// </summary>
         /// <param name="path">The path string from which to obtain the name.</param>
@@ -72,14 +98,15 @@ namespace ShuHai
         {
             Ensure.Argument.NotNull(path, nameof(path));
 
-            var trimmedPath = path.Trim(separators);
-            var index = trimmedPath.LastIndexOfAny(separators);
+            var trimmedPath = path.Trim(_separators);
+            var index = trimmedPath.LastIndexOfAny(_separators);
             if (index < 0)
             {
                 if (trimmedPath.Length > 0 && trimmedPath[trimmedPath.Length - 1] == Path.VolumeSeparatorChar)
                     return string.Empty;
                 return trimmedPath;
             }
+
             return trimmedPath.Substring(index + 1);
         }
 
@@ -91,13 +118,14 @@ namespace ShuHai
         {
             Ensure.Argument.NotNull(path, nameof(path));
 
-            var index = path.Trim(separators).LastIndexOfAny(separators);
+            var index = path.Trim(_separators).LastIndexOfAny(_separators);
             if (index >= 0)
             {
                 if (index > 0 && path[index - 1] == Path.VolumeSeparatorChar)
                     index--;
                 return path.Remove(index);
             }
+
             return string.Empty;
         }
 
@@ -147,11 +175,11 @@ namespace ShuHai
         public static IEnumerable<string> Split(string path)
         {
             Ensure.Argument.NotNull(path, nameof(path));
-            
-            var names = path.Split(separators);
+
+            var names = path.Split(_separators);
             return names.Where(n => n != string.Empty);
         }
 
-        private static readonly char[] separators = { DirectorySeparatorChar, AltDirectorySeparatorChar };
+        private static readonly char[] _separators = { DirectorySeparatorChar, AltDirectorySeparatorChar };
     }
 }

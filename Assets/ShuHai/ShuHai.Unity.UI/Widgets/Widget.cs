@@ -12,13 +12,18 @@ namespace ShuHai.Unity.UI
         public bool Active
         {
             get => gameObject.activeSelf;
-            set => gameObject.SetActive(value);
+            set
+            {
+                if (gameObject)
+                    gameObject.SetActive(value);
+            }
         }
 
         protected Widget()
         {
             _rectTransform = new Lazy<RectTransform>(EnsureRectTransform);
             _selectionOutline = new Lazy<Outline>(GetSelectionOutline);
+            _layouter = new Lazy<IWidgetLayouter>(GetLayouter);
         }
 
         #region Root
@@ -28,13 +33,16 @@ namespace ShuHai.Unity.UI
             get
             {
                 if (!_root)
-                    _root = gameObject.GetComponentsInParent<WidgetsRoot>(false).FirstOrDefault(c => c.isActiveAndEnabled);
+                {
+                    _root = gameObject.GetComponentsInParent<WidgetsRoot>(false)
+                        .FirstOrDefault(c => c.isActiveAndEnabled);
+                }
                 return _root;
             }
         }
 
         private WidgetsRoot _root;
-        
+
         #endregion Root
 
         #region Canvas
@@ -125,5 +133,15 @@ namespace ShuHai.Unity.UI
         }
 
         #endregion Transform
+
+        #region Layouter
+
+        public IWidgetLayouter Layouter => _layouter.Value;
+
+        private readonly Lazy<IWidgetLayouter> _layouter;
+
+        private IWidgetLayouter GetLayouter() { return gameObject.GetComponent<IWidgetLayouter>(); }
+
+        #endregion Layouter
     }
 }

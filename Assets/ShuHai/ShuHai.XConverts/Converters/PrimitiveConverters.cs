@@ -19,6 +19,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(bool))]
     public sealed class BooleanConverter : PrimitiveConverter
     {
+        public new static BooleanConverter Default { get; } = new BooleanConverter();
+
         public BooleanConverter() { }
         public BooleanConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -36,6 +38,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(char))]
     public sealed class CharConverter : PrimitiveConverter
     {
+        public new static CharConverter Default { get; } = new CharConverter();
+
         public CharConverter() { }
         public CharConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -50,6 +54,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(byte))]
     public sealed class ByteConverter : PrimitiveConverter
     {
+        public new static ByteConverter Default { get; } = new ByteConverter();
+
         public ByteConverter() { }
         public ByteConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -64,6 +70,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(sbyte))]
     public sealed class SByteConverter : PrimitiveConverter
     {
+        public new static SByteConverter Default { get; } = new SByteConverter();
+
         public SByteConverter() { }
         public SByteConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -78,6 +86,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(short))]
     public sealed class Int16Converter : PrimitiveConverter
     {
+        public new static Int16Converter Default { get; } = new Int16Converter();
+
         public Int16Converter() { }
         public Int16Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -92,6 +102,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(ushort))]
     public sealed class UInt16Converter : PrimitiveConverter
     {
+        public new static UInt16Converter Default { get; } = new UInt16Converter();
+
         public UInt16Converter() { }
         public UInt16Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -106,6 +118,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(int))]
     public sealed class Int32Converter : PrimitiveConverter
     {
+        public new static Int32Converter Default { get; } = new Int32Converter();
+
         public Int32Converter() { }
         public Int32Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -120,6 +134,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(uint))]
     public sealed class UInt32Converter : PrimitiveConverter
     {
+        public new static UInt32Converter Default { get; } = new UInt32Converter();
+
         public UInt32Converter() { }
         public UInt32Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -134,6 +150,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(long))]
     public sealed class Int64Converter : PrimitiveConverter
     {
+        public new static Int64Converter Default { get; } = new Int64Converter();
+
         public Int64Converter() { }
         public Int64Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -148,6 +166,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(ulong))]
     public sealed class UInt64Converter : PrimitiveConverter
     {
+        public new static UInt64Converter Default { get; } = new UInt64Converter();
+
         public UInt64Converter() { }
         public UInt64Converter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -162,6 +182,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(float))]
     public sealed class SingleConverter : PrimitiveConverter
     {
+        public new static SingleConverter Default { get; } = new SingleConverter();
+
         public SingleConverter() { }
         public SingleConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -176,6 +198,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(double))]
     public sealed class DoubleConverter : PrimitiveConverter
     {
+        public new static DoubleConverter Default { get; } = new DoubleConverter();
+
         public DoubleConverter() { }
         public DoubleConverter(ValueStyle valueStyle) : base(valueStyle) { }
 
@@ -190,9 +214,11 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(IntPtr))]
     public sealed class IntPtrConverter : PrimitiveConverter
     {
+        public new static IntPtrConverter Default { get; } = new IntPtrConverter();
+
         public IntPtrConverter() { }
         public IntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
-        
+
         protected override object Parse(string value, XConvertSettings settings)
         {
             return IntPtr.Size == 4 ? (IntPtr)int.Parse(value) : (IntPtr)long.Parse(value);
@@ -202,6 +228,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(UIntPtr))]
     public sealed class UIntPtrConverter : PrimitiveConverter
     {
+        public new static UIntPtrConverter Default { get; } = new UIntPtrConverter();
+
         public UIntPtrConverter() { }
         public UIntPtrConverter(ValueStyle valueStyle) : base(valueStyle) { }
 

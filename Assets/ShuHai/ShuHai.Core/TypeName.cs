@@ -150,14 +150,24 @@ namespace ShuHai
 
         public string ToString(FormatterAssemblyStyle? assemblyNameStyle) { return ToString(true, assemblyNameStyle); }
 
+        /// <summary>
+        ///     Build a string representing the current instance.
+        /// </summary>
+        /// <param name="withNamespace">Whether to include namespace name in the result string.</param>
+        /// <param name="assemblyNameStyle">
+        ///     Determines whether to append assembly name of the type, and in what format the assembly name is represented
+        ///     if the value is not <see langword="null" />.
+        /// </param>
         public string ToString(bool withNamespace, FormatterAssemblyStyle? assemblyNameStyle)
         {
             return ToString(new StringBuilder(), withNamespace, assemblyNameStyle).ToString();
         }
 
-        private StringBuilder ToString(StringBuilder builder,
+        public StringBuilder ToString(StringBuilder builder,
             bool withNamespace, FormatterAssemblyStyle? assemblyNameStyle)
         {
+            Ensure.Argument.NotNull(builder, nameof(builder));
+            
             builder.Append(withNamespace ? DeclareName : Name);
             AppendGenericArguments(builder, withNamespace, assemblyNameStyle);
             AppendArrayRanks(builder);
@@ -343,7 +353,7 @@ namespace ShuHai
 
         public static TypeName Get(Type type)
         {
-            Ensure.Argument.NotNull(type, "type");
+            Ensure.Argument.NotNull(type, nameof(type));
             return Get(type.AssemblyQualifiedName);
         }
 

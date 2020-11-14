@@ -15,7 +15,7 @@ namespace ShuHai.Unity.Editor
         [MenuItem(CopyMenuPath, true)]
         public static bool CanCopyAssets() { return !CollectionUtil.IsNullOrEmpty(Selection.objects); }
 
-        [MenuItem(CopyMenuPath)]
+        [MenuItem(CopyMenuPath, false, 19)]
         public static void CopyAssets()
         {
             _copyAssetsClipboard.Clear();
@@ -28,7 +28,7 @@ namespace ShuHai.Unity.Editor
         [MenuItem(PasteMenuPath, true)]
         public static bool CanPasteAssets() { return _copyAssetsClipboard.Count > 0; }
 
-        [MenuItem(PasteMenuPath)]
+        [MenuItem(PasteMenuPath, false, 19)]
         public static void PasteAssets()
         {
             var folderPath = GetSelectedFolderPath();
@@ -45,7 +45,7 @@ namespace ShuHai.Unity.Editor
         {
             var srcAssetName = Path.GetFileNameWithoutExtension(srcAssetPath);
             var srcAssetExt = Path.GetExtension(srcAssetPath);
-            var assetNames = AssetDatabaseEx.EnumerateAllAssetPathsInFolder(folderPath, true)
+            var assetNames = AssetDatabaseEx.EnumerateAssetPathsInFolder(folderPath, true)
                 .Select(Path.GetFileNameWithoutExtension)
                 .Where(p => string.IsNullOrEmpty(srcAssetExt) || !p.EndsWith(srcAssetExt));
 

@@ -4,43 +4,13 @@ using UnityEngine;
 
 namespace ShuHai.Unity
 {
+    [DefaultExecutionOrder(1000)]
+    [AddComponentMenu(ShuHai.AssemblyInfo.RootNamespace + "/Root")]
     internal sealed class RootBehaviour : MonoBehaviour
     {
-        private void Awake() { Instance = this; }
+        #region Instances
 
-        private void OnDestroy() { Instance = null; }
-
-        private void Start()
-        {
-            if (EnsureSingleton())
-                Root.Initialize();
-        }
-
-        private void FixedUpdate()
-        {
-            if (EnsureSingleton())
-                Root.FixedUpdate();
-        }
-
-        private void Update()
-        {
-            if (EnsureSingleton())
-                Root.Update();
-        }
-
-        private void LateUpdate()
-        {
-            if (EnsureSingleton())
-                Root.LateUpdate();
-        }
-
-        private void OnApplicationQuit()
-        {
-            if (EnsureSingleton())
-                Root.Deinitialize();
-
-            DestroyImmediate(gameObject);
-        }
+        private RootBehaviour() { _instances.Add(this); }
 
         private bool EnsureSingleton()
         {
@@ -49,23 +19,6 @@ namespace ShuHai.Unity
             DestroyInstance(this);
             return false;
         }
-
-        private RootBehaviour() { _instances.Add(this); }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Initialize()
-        {
-            Instance = SceneManagerEx.FindComponent<RootBehaviour>();
-            if (!Instance)
-            {
-                var gameObject = new GameObject(typeof(RootBehaviour).FullName) { hideFlags = HideFlags.DontSave };
-                DontDestroyOnLoad(gameObject);
-                gameObject.AddComponent<RootBehaviour>();
-            }
-            MakeSingleton(Instance);
-        }
-
-        #region Instances
 
         public static RootBehaviour Instance { get; private set; }
 
@@ -86,5 +39,60 @@ namespace ShuHai.Unity
         }
 
         #endregion Instances
+
+        #region Unity Events
+
+        private void Awake()
+        {
+            MakeSingleton(this);
+            Instance = this;
+        }
+
+        private void OnDestroy() { Instance = null; }
+
+        private void Start()
+        {
+            if (EnsureSingleton())
+                Root._Initialize();
+        }
+
+        private void FixedUpdate()
+        {
+            if (EnsureSingleton())
+                Root._FixedUpdate();
+        }
+
+        private void Update()
+        {
+            if (EnsureSingleton())
+                Root._Update();
+        }
+
+        private void LateUpdate()
+        {
+            if (EnsureSingleton())
+                Root._LateUpdate();
+        }
+
+        private void OnApplicationQuit()
+        {
+            Root.ApplicationQuiting = true;
+
+            if (EnsureSingleton())
+                Root._Deinitialize();
+
+            DestroyImmediate(gameObject);
+        }
+
+        #endregion Unity Events
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Initialize()
+        {
+            var obj = new GameObject(typeof(Root).FullName);
+            DontDestroyOnLoad(obj);
+
+            obj.AddComponent<RootBehaviour>();
+        }
     }
 }

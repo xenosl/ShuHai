@@ -99,10 +99,8 @@ namespace ShuHai.Unity.Editor
         public static string ToRooted(string path)
         {
             Ensure.Argument.NotNull(path, nameof(path));
-            if (!IsAssetPath(path))
-                throw new ArgumentException("Asset path is required.", nameof(path));
-
-            return PathEx.Normalize(Path.Combine(Project.RootPath, path));
+            UnityEnsure.Argument.AssetPath(path, nameof(path));
+            return PathEx.Combine(Project.RootDirectory, path);
         }
 
         /// <summary>

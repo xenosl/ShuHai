@@ -37,25 +37,40 @@ namespace ShuHai.Unity
 
         #region Equality
 
-        public static bool AlmostEquals(this Vector2 self, Vector2 other, float epsilon = float.Epsilon)
+        public static bool AlmostEquals(this Vector2 self, Vector2 other)
         {
-            return self.x.AlmostEquals(other.x, epsilon)
-                && self.y.AlmostEquals(other.y, epsilon);
+            return AlmostEquals(self, other, Primitives.DefaultFloatTolerance);
         }
 
-        public static bool AlmostEquals(this Vector3 self, Vector3 other, float epsilon = float.Epsilon)
+        public static bool AlmostEquals(this Vector2 self, Vector2 other, float tolerance)
         {
-            return self.x.AlmostEquals(other.x, epsilon)
-                && self.y.AlmostEquals(other.y, epsilon)
-                && self.z.AlmostEquals(other.z, epsilon);
+            return self.x.AlmostEquals(other.x, tolerance)
+                   && self.y.AlmostEquals(other.y, tolerance);
         }
 
-        public static bool AlmostEquals(this Vector4 self, Vector4 other, float epsilon = float.Epsilon)
+        public static bool AlmostEquals(this Vector3 self, Vector3 other)
         {
-            return self.x.AlmostEquals(other.x, epsilon)
-                && self.y.AlmostEquals(other.y, epsilon)
-                && self.z.AlmostEquals(other.z, epsilon)
-                && self.w.AlmostEquals(other.w, epsilon);
+            return AlmostEquals(self, other, Primitives.DefaultFloatTolerance);
+        }
+
+        public static bool AlmostEquals(this Vector3 self, Vector3 other, float tolerance)
+        {
+            return self.x.AlmostEquals(other.x, tolerance)
+                   && self.y.AlmostEquals(other.y, tolerance)
+                   && self.z.AlmostEquals(other.z, tolerance);
+        }
+
+        public static bool AlmostEquals(this Vector4 self, Vector4 other)
+        {
+            return AlmostEquals(self, other, Primitives.DefaultFloatTolerance);
+        }
+
+        public static bool AlmostEquals(this Vector4 self, Vector4 other, float tolerance)
+        {
+            return self.x.AlmostEquals(other.x, tolerance)
+                   && self.y.AlmostEquals(other.y, tolerance)
+                   && self.z.AlmostEquals(other.z, tolerance)
+                   && self.w.AlmostEquals(other.w, tolerance);
         }
 
         #endregion Equality

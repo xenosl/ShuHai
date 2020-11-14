@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -12,7 +14,7 @@ namespace ShuHai.XConverts
     [XConvertType(typeof(object))]
     public class XConverter
     {
-        public static readonly XConverter Default = new XConverter();
+        public static XConverter Default { get; } = new XConverter();
 
         protected XConverter() { ConvertType = GetConvertType(); }
 
@@ -57,20 +59,32 @@ namespace ShuHai.XConverts
         /// </summary>
         public virtual bool CanConvert(object @object)
         {
-            if (ConvertType.IsValueType)
-                return !ReferenceEquals(@object, null) && CanConvert(@object.GetType());
-            return ReferenceEquals(@object, null) || CanConvert(@object.GetType());
+            return ConvertType.IsValueType
+                ? !ReferenceEquals(@object, null) && CanConvert(@object.GetType())
+                : ReferenceEquals(@object, null) || CanConvert(@object.GetType());
         }
 
-        public XElement ToXElement(object @object, string elementName, XConvertSettings settings = null)
+        public XElement ToXElement(object @object,
+            string elementName, XConvertSettings settings = null, XConvertToXElementSession session = null)
         {
             Ensure.Argument.NotNullOrEmpty(elementName, nameof(elementName));
-            XConvert.ArgOrDefault(ref settings);
             if (!CanConvert(@object))
                 throw new ArgumentException("Unable to convert object to xml element.", nameof(@object));
 
+            settings = settings ?? XConvertSettings.Default;
+            if (ReferenceEquals(@object, null))
+                return CreateNullXElement(elementName, settings.AssemblyNameStyle);
+
+            session = session ?? new XConvertToXElementSession();
+            if (session.TryGetID(@object, out var id))
+                return CreateObjectReferenceXElement(elementName, id);
+
             var element = new XElement(elementName);
-            PopulateXElement(element, @object, settings ?? XConvertSettings.Default);
+            session.AddElement(@object, element);
+            var type = @object.GetType();
+            if (!type.IsValueType)
+                XConvert.WriteObjectID(element, session.GetOrGenerateID(@object));
+            PopulateXElement(element, @object, settings, session);
             return element;
         }
 
@@ -83,40 +97,53 @@ namespace ShuHai.XConverts
         ///     Convert settings used when populating. <see cref="XConvertSettings.Default" /> will be used if the value is
         ///     <see langword="null" />.
         /// </param>
-        protected virtual void PopulateXElement(XElement element, object @object, XConvertSettings settings)
+        /// <param name="session">Session information of current convertion.</param>
+        protected virtual void PopulateXElement(XElement element,
+            object @object, XConvertSettings settings, XConvertToXElementSession session)
         {
             element.RemoveAll();
-            PopulateXAttributes(element, @object, settings);
-
-            if (!ReferenceEquals(@object, null))
-            {
-                PopulateXElementValue(element, @object, settings);
-                PopulateXElementChildren(element, @object, settings);
-            }
+            PopulateXElementAttributes(element, @object, settings, session);
+            PopulateXElementValue(element, @object, settings);
+            PopulateXElementChildren(element, @object, settings);
         }
 
-        protected virtual void PopulateXAttributes(XElement element, object @object, XConvertSettings settings)
+        protected virtual void PopulateXElementAttributes(XElement element,
+            object @object, XConvertSettings settings, XConvertToXElementSession session)
         {
-            XConvert.WriteObjectType(element, @object?.GetType(), settings.AssemblyNameStyle);
+            XConvert.WriteObjectType(element, @object.GetType(), settings.AssemblyNameStyle);
         }
 
         protected virtual void PopulateXElementValue(XElement element, object @object, XConvertSettings settings) { }
 
         protected virtual void PopulateXElementChildren(XElement element, object @object, XConvertSettings settings)
         {
-            var type = @object.GetType();
-            foreach (var member in XConvert.CollectConvertMembers(type))
+            foreach (var member in XConvert.CollectConvertMembers(@object.GetType()))
                 element.Add(member.ToXElement(@object, settings));
+        }
+
+        protected XElement CreateNullXElement(string elementName, FormatterAssemblyStyle? typeNameStyle)
+        {
+            var element = new XElement(elementName);
+            XConvert.WriteObjectType(element, ConvertType.IsInstantiable() ? ConvertType : null, typeNameStyle);
+            XConvert.WriteNullFlag(element, true);
+            return element;
+        }
+
+        protected static XElement CreateObjectReferenceXElement(string elementName, long objectID)
+        {
+            var element = new XElement(elementName);
+            XConvert.WriteObjectReference(element, objectID);
+            return element;
         }
 
         #endregion Object To XElement
 
         #region XElement To Object
 
-        public object ToObject(XElement element, XConvertSettings settings = null)
+        public object ToObject(XElement element,
+            XConvertSettings settings = null, XConvertToObjectSession session = null)
         {
             Ensure.Argument.NotNull(element, nameof(element));
-            XConvert.ArgOrDefault(ref settings);
 
             var type = XConvert.ParseObjectType(element);
             if (type == null)
@@ -125,8 +152,25 @@ namespace ShuHai.XConverts
             if (!CanConvert(type))
                 throw new XmlException($"Can not convert specified xml element to '{type}' by {GetType()}.");
 
-            var @object = CreateObject(element, type, settings);
-            PopulateObjectMembers(@object, element, settings);
+            if (XConvert.TryParseNullFlag(element, out var isNull) && isNull)
+                return null;
+
+            object @object;
+            if (type.IsValueType)
+            {
+                @object = CreateObject(element, type, settings ?? XConvertSettings.Default);
+                PopulateObjectMembers(@object, element, settings);
+            }
+            else
+            {
+                session = session ?? new XConvertToObjectSession();
+                if (XConvert.TryParseObjectReference(element, out var objectID))
+                    return session.GetObject(objectID);
+
+                @object = CreateObject(element, type, settings ?? XConvertSettings.Default);
+                session.AddObject(element, @object);
+                PopulateObjectMembers(@object, element, settings);
+            }
             return @object;
         }
 
@@ -156,28 +200,45 @@ namespace ShuHai.XConverts
 
         #endregion XElement To Object
 
-        #region Built-in Instances
+        #region Instances
 
         /// <summary>
-        ///     The collection that contains all default instances of all built-in <see cref="XConverter" />s.
+        ///     A collection of built-in converters.
         /// </summary>
-        public static readonly IReadOnlyXConverterCollection BuiltIns;
+        public static IReadOnlyXConverterCollection BuiltIns { get; }
+            = new XConverterCollection(DefaultConverters(typeof(XConverter).Assembly.ToEnumerable()));
 
-        private static IReadOnlyXConverterCollection CollectBuiltIns()
+        /// <summary>
+        ///     A collection of all default instance of all instantiable converter types.
+        /// </summary>
+        /// <remarks>
+        ///     The default instance here refers to the static property named 'Default' in certain converter class.
+        ///     The instantiable type here indicates the type is not an abstract class.
+        /// </remarks>
+        public static IReadOnlyXConverterCollection Defaults { get; }
+            = new XConverterCollection(DefaultConverters(Assemblies.Instances));
+
+        private static IEnumerable<XConverter> DefaultConverters(IEnumerable<Assembly> searchAssemblies)
         {
-            var rootType = typeof(XConverter);
-            var converters = rootType.Assembly.GetTypes()
-                .Where(t => t != rootType && !t.IsAbstract && rootType.IsAssignableFrom(t))
-                .Select(Activator.CreateInstance)
-                .Cast<XConverter>();
-
-            var builtIns = new XConverterCollection { Default };
-            builtIns.AddRange(converters);
-            return builtIns;
+            return InstantiableConverterTypes(searchAssemblies)
+                .Select(DefaultInstanceOf)
+                .Where(c => c != null);
         }
 
-        #endregion Built-in Instances
+        private static IEnumerable<Type> InstantiableConverterTypes(IEnumerable<Assembly> searchAssemblies)
+        {
+            var rootType = typeof(XConverter);
+            return searchAssemblies.SelectMany(a => a.GetTypes())
+                .Where(t => t != rootType && !t.IsAbstract && rootType.IsAssignableFrom(t));
+        }
 
-        static XConverter() { BuiltIns = CollectBuiltIns(); }
+        private static XConverter DefaultInstanceOf(Type type)
+        {
+            var property = type.GetProperty("Default", BindingFlags.Static | BindingFlags.Public);
+            var converter = (XConverter)property?.GetValue(null);
+            return converter != null && converter.GetType() == type ? converter : null;
+        }
+
+        #endregion Instances
     }
 }

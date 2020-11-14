@@ -20,6 +20,28 @@ namespace ShuHai
                     throw new ArgumentNullException(name, message);
             }
 
+            public static void AllNotNull<T>(IEnumerable<T> arg, string name)
+            {
+                if (arg is IReadOnlyList<T> list)
+                {
+                    for (int i = 0; i < list.Count; ++i)
+                    {
+                        if (list[i] == null)
+                            throw new ArgumentNullException($"{name}[{i}]");
+                    }
+                }
+                else
+                {
+                    int i = 0;
+                    foreach (var item in arg)
+                    {
+                        if (item == null)
+                            throw new ArgumentNullException($"{name}[{i}]");
+                        i++;
+                    }
+                }
+            }
+
             public static void NotEmpty<T>(IEnumerable<T> arg, string name)
             {
                 if (!arg.Any())

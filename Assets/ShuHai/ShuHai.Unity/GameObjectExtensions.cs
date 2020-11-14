@@ -27,6 +27,15 @@ namespace ShuHai.Unity
             }
         }
 
+        public static IEnumerable<GameObject> EnumerateChildren(this GameObject self)
+        {
+            UnityEnsure.Argument.NotNull(self, nameof(self));
+
+            var t = self.transform;
+            for (int i = 0; i < t.childCount; ++i)
+                yield return t.GetChild(i).gameObject;
+        }
+
         public static GameObject FindOrCreateChild(this GameObject self, string name)
         {
             Ensure.Argument.NotNull(self, nameof(self));
@@ -124,7 +133,7 @@ namespace ShuHai.Unity
             return (T)GetOrAddComponentImpl(self, typeof(T));
         }
 
-        private static Component GetOrAddComponent(this GameObject self, Type type)
+        public static Component GetOrAddComponent(this GameObject self, Type type)
         {
             Ensure.Argument.NotNull(type, nameof(type));
             Ensure.Argument.Is<Component>(type, nameof(type));

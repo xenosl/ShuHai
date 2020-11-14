@@ -4,27 +4,22 @@ namespace ShuHai.XConverts
 {
     public static class XConverterSelector
     {
-        public static XConverter SelectWithBuiltins(
-            IReadOnlyXConverterCollection collection, object @object, Type fallbackType = null)
+        public static XConverter Select(object @object, Type fallbackType = null)
         {
             var type = @object?.GetType();
             if (type == null)
                 type = fallbackType;
-            return type == null ? XConverter.Default : SelectWithBuiltins(collection, type);
+            return type == null ? XConverter.Default : Select(type);
         }
 
         /// <summary>
-        ///     Select the most appropriate converter for the specified convert type from the specified converter collection.
-        ///     The <see cref="XConverter.BuiltIns" /> is used if the specified converter collection is empty.
+        ///     Select the most appropriate converter for the specified convert type form <see cref="XConverter.Defaults" />.
         /// </summary>
-        public static XConverter SelectWithBuiltins(
-            IReadOnlyXConverterCollection collection, Type convertType)
+        public static XConverter Select(Type convertType)
         {
-            if (TrySelect(collection, convertType, out var converter))
-                return converter;
-            if (TrySelect(XConverter.BuiltIns, convertType, out converter))
-                return converter;
-            return XConverter.Default;
+            return TrySelect(XConverter.Defaults, convertType, out var converter)
+                ? converter
+                : XConverter.Default;
         }
 
         /// <summary>

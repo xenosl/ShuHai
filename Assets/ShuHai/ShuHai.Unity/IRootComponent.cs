@@ -1,19 +1,7 @@
-namespace ShuHai.Unity
+﻿namespace ShuHai.Unity
 {
     /// <summary>
-    ///     Represents a logical component that attached to <see cref="Root" />
+    ///     Indicates the type implements the interface is managed by <see cref="Root" /> automatically.
     /// </summary>
-    /// <remarks>
-    ///     A default constructor is required for all classes that implemented the <see langword="interface" /> since the
-    ///     <see cref="Root" /> class instantiate the component instance using the default constructor.
-    /// </remarks>
-    public interface IRootComponent
-    {
-        void Initialize();
-        void Deinitialize();
-
-        void FixedUpdate();
-        void Update();
-        void LateUpdate();
-    }
+    public interface IRootComponent { }
 }

@@ -19,45 +19,47 @@ namespace ShuHai.Graphicode.Unity.Demo
     {
         #region Modes
 
-        public static DemoMode Mode
-        {
-            get => StateMachine.State;
-            set => StateMachine.State = value;
-        }
+        public static DemoMode Mode { get => StateMachine.State; set => StateMachine.State = value; }
 
         private static readonly StateMachine StateMachine = new StateMachine(DemoMode.Inactive);
 
         private static void InitializeStates()
         {
-            StateMachine.RegisterChangeEventPair(DemoMode.Play, OnPlayModeEntered, OnPlayModeExiting);
-            StateMachine.RegisterChangeEventPair(DemoMode.Edit, OnEditModeEntered, OnEditModeExiting);
+            StateMachine.RegisterChangeEvents(DemoMode.Play, OnPlayModeEntered, OnPlayModeExiting);
+            StateMachine.RegisterChangeEvents(DemoMode.Edit, OnEditModeEntered, OnEditModeExiting);
         }
 
         private static void DeinitializeStates()
         {
-            StateMachine.UnregisterChangeEventPair(DemoMode.Edit, OnEditModeEntered, OnEditModeExiting);
-            StateMachine.UnregisterChangeEventPair(DemoMode.Play, OnPlayModeEntered, OnPlayModeExiting);
+            StateMachine.UnregisterChangeEvents(DemoMode.Edit, OnEditModeEntered, OnEditModeExiting);
+            StateMachine.UnregisterChangeEvents(DemoMode.Play, OnPlayModeEntered, OnPlayModeExiting);
         }
 
         private static void StartMode() { Mode = DemoMode.Play; }
 
         private static void StopMode() { Mode = DemoMode.Inactive; }
 
-        private static void OnPlayModeEntered(StateMachine.Event evt)
+        private static void OnPlayModeEntered(StateMachine.Transition t, DemoMode src, DemoMode dst, object[] args)
         {
             EnterMode(DemoMode.Play);
             Descriptions.ActiveRectMode = DemoMode.Play;
         }
 
-        private static void OnPlayModeExiting(StateMachine.Event evt) { ExitMode(DemoMode.Play); }
+        private static void OnPlayModeExiting(StateMachine.Transition t, DemoMode src, DemoMode dst, object[] args)
+        {
+            ExitMode(DemoMode.Play);
+        }
 
-        private static void OnEditModeEntered(StateMachine.Event evt)
+        private static void OnEditModeEntered(StateMachine.Transition t, DemoMode src, DemoMode dst, object[] args)
         {
             Descriptions.ActiveRectMode = DemoMode.Edit;
             EnterMode(DemoMode.Edit);
         }
 
-        private static void OnEditModeExiting(StateMachine.Event evt) { ExitMode(DemoMode.Edit); }
+        private static void OnEditModeExiting(StateMachine.Transition t, DemoMode src, DemoMode dst, object[] args)
+        {
+            ExitMode(DemoMode.Edit);
+        }
 
         #region Handlers
 

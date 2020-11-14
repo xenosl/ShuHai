@@ -93,6 +93,22 @@ namespace ShuHai
 
         #region List
 
+        public static bool TryGet<T>(this IReadOnlyList<T> self, int index, out T value, bool allowLoopedIndex = false)
+        {
+            Ensure.Argument.NotNull(self, nameof(self));
+
+            if (allowLoopedIndex)
+                index = Index.Loop(index, self.Count);
+
+            if (!Index.IsValid(index, self.Count))
+            {
+                value = default;
+                return false;
+            }
+            value = self[index];
+            return true;
+        }
+
         /// <summary>
         ///     Get a value from list at specific <paramref name="index" />.
         /// </summary>
@@ -113,7 +129,7 @@ namespace ShuHai
         public static T LoopedAt<T>(this IReadOnlyList<T> self, int index, T valueOnOutOfRange = default)
         {
             Ensure.Argument.NotNull(self, nameof(self));
-            return self.At(index = Index.Loop(index, self.Count), valueOnOutOfRange);
+            return self.At(Index.Loop(index, self.Count), valueOnOutOfRange);
         }
 
         /// <summary>
@@ -242,6 +258,16 @@ namespace ShuHai
         #endregion List
 
         #region Dictionary
+
+#if NET_LEGACY || NET_4_6 || NET_STANDARD_2_0
+        public static bool TryAdd<TKey, TValue>(this Dictionary<TKey, TValue> self, TKey key, TValue value)
+        {
+            if (self.ContainsKey(key))
+                return false;
+            self.Add(key, value);
+            return true;
+        }
+#endif
 
         /// <summary>
         ///     Get element with specified key.

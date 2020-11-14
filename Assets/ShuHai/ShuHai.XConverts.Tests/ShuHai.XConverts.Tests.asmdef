@@ -1,6 +1,8 @@
 {
     "name": "ShuHai.XConverts.Tests",
     "references": [
+        "GUID:2f3f35f1347586048b0a7c361332f826",
+        "GUID:8dd5f94c922db4df496b952fd479d863",
         "GUID:c282b176cb4a84205a266bf62359eff5"
     ],
     "includePlatforms": [

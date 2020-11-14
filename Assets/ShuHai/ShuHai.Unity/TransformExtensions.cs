@@ -76,12 +76,22 @@ namespace ShuHai.Unity
 
         public static IEnumerable<Transform> EnumerateParents(this Transform self)
         {
+            UnityEnsure.Argument.NotNull(self, nameof(self));
+
             var p = self;
             while (p)
             {
                 p = p.parent;
                 yield return p;
             }
+        }
+
+        public static IEnumerable<Transform> EnumerateChildren(this Transform self)
+        {
+            UnityEnsure.Argument.NotNull(self, nameof(self));
+
+            for (int i = 0; i < self.childCount; ++i)
+                yield return self.GetChild(i);
         }
 
         public static Transform FindOrCreateChild(this Transform self, string name)

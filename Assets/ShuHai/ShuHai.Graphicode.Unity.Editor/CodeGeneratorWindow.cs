@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using ShuHai.Graphicode.Generator;
 using ShuHai.Graphicode.Unity.Editor.UI;
+using ShuHai.Unity.Editor;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -13,7 +14,7 @@ namespace ShuHai.Graphicode.Unity.Editor
     {
         public const string Title = "Code Generator for CodeGraph";
 
-        [MenuItem("ShuHai/" + Title)]
+        [MenuItem(MenuInfo.Path + Title)]
         public static CodeGeneratorWindow Open()
         {
             var w = Get();
@@ -167,7 +168,7 @@ namespace ShuHai.Graphicode.Unity.Editor
             var filterText = _methodList.FilterText;
             return filterText == null || method.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase);
         }
-        
+
         private static bool IsMethodSupported(MethodInfo method) { return UnitCodeGenerator.IsSupported(method); }
 
         private static MethodInfo[] GetMethods(Type type)

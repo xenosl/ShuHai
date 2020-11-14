@@ -27,6 +27,9 @@ namespace ShuHai
 
         #region Cached Types
 
+        public ITypeCollection AssignableTypes =>
+            _assignableTypes ?? (_assignableTypes = Type.EnumerateSelfAndDerivedTypes(SearchAssemblies).ToArray());
+
         /// <summary>
         ///     All derived types of current instance.
         /// </summary>
@@ -73,6 +76,7 @@ namespace ShuHai
         public ITypeCollection ConstructedTypes =>
             _constructedTypes ?? (_constructedTypes = Type.EnumerateConstructedTypes(SearchAssemblies).ToArray());
 
+        private ITypeCollection _assignableTypes;
         private ITypeCollection _derivedTypes;
         private ITypeCollection _directDerivedTypes;
         private ITypeCollection _interfaces;
@@ -82,6 +86,7 @@ namespace ShuHai
 
         private void ClearCachedTypes()
         {
+            _assignableTypes = null;
             _derivedTypes = null;
             _directDerivedTypes = null;
             _interfaces = null;
@@ -108,7 +113,8 @@ namespace ShuHai
         private void ClearCachedMembers() { _methods = null; }
 
         private const BindingFlags BindingAttrForAll = BindingFlags.DeclaredOnly |
-            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+                                                       BindingFlags.Public | BindingFlags.NonPublic |
+                                                       BindingFlags.Static | BindingFlags.Instance;
 
         #endregion Cached Members
 

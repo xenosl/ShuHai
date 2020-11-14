@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using NUnit.Framework;
 using ShuHai.XConverts.Converters;
 
@@ -35,110 +34,100 @@ namespace ShuHai.XConverts
         {
             var c = XConverter.Default;
 
-            ConvertTest(c, null);
-            ConvertTest(c, 2);
-            ConvertTest(c, 4.231f);
-            ConvertTest(c, 931.5523358);
-            ConvertTest(c, Guid.NewGuid());
-            ConvertTest(c, new KeyValuePair<int, string>(12, "Twelve"));
+            c.ConvertedEqual(null);
+            c.ConvertedEqual(2);
+            c.ConvertedEqual(4.231f);
+            c.ConvertedEqual(931.5523358);
+            c.ConvertedEqual(Guid.NewGuid());
+            c.ConvertedEqual(new KeyValuePair<int, string>(12, "Twelve"));
 
-            ConvertTest(c, 'c');
-            ConvertTest(c, '$');
-            ConvertTest(c, ' ');
-            ConvertTest(c, '\\');
-            ConvertTest(c, '\t');
+            c.ConvertedEqual('c');
+            c.ConvertedEqual('$');
+            c.ConvertedEqual(' ');
+            c.ConvertedEqual('\\');
+            c.ConvertedEqual('\t');
 
-            ConvertTest(c, 0);
-            ConvertTest(c, 12);
-            ConvertTest(c, -22);
-            ConvertTest(c, int.MinValue);
-            ConvertTest(c, int.MaxValue);
+            c.ConvertedEqual(0);
+            c.ConvertedEqual(12);
+            c.ConvertedEqual(-22);
+            c.ConvertedEqual(int.MinValue);
+            c.ConvertedEqual(int.MaxValue);
 
-            ConvertTest(c, 0f);
-            ConvertTest(c, 12.122f);
-            ConvertTest(c, -22.001f);
-            ConvertTest(c, float.NaN);
-            ConvertTest(c, float.Epsilon);
+            c.ConvertedEqual(0f);
+            c.ConvertedEqual(12.122f);
+            c.ConvertedEqual(-22.001f);
+            c.ConvertedEqual(float.NaN);
+            c.ConvertedEqual(float.Epsilon);
 
-            ConvertTest(c, float.MinValue, SettingsForByteValues);
-            ConvertTest(c, float.MaxValue, SettingsForByteValues);
+            c.ConvertedEqual(float.MinValue, SettingsForByteValues);
+            c.ConvertedEqual(float.MaxValue, SettingsForByteValues);
         }
 
         [Test]
         public void TypeConvert()
         {
-            var c = XConverter.BuiltIns[typeof(Type)];
-            ConvertTest(c, typeof(string));
-            ConvertTest(c, typeof(XConvertsTests));
+            var c = TypeConverter.Default;
+            c.ConvertedEqual(typeof(string));
+            c.ConvertedEqual(typeof(XConvertsTests));
         }
 
         [Test]
         public void StringConvert()
         {
-            var c = XConverter.BuiltIns[typeof(string)];
-            ConvertTest(c, null);
-            ConvertTest(c, string.Empty);
-            ConvertTest(c, "This is a string.");
+            var c = StringConverter.Default;
+            c.ConvertedEqual(null);
+            c.ConvertedEqual(string.Empty);
+            c.ConvertedEqual("This is a string.");
         }
 
         [Test]
         public void DecimalConvert()
         {
-            var c = XConverter.BuiltIns[typeof(decimal)];
-            ConvertTest(c, 12.23m);
-            ConvertTest(c, decimal.MinValue);
-            ConvertTest(c, decimal.MaxValue);
-            ConvertTest(c, decimal.MinusOne);
-            ConvertTest(c, decimal.Zero);
-            ConvertTest(c, decimal.One);
+            var c = DecimalConverter.Default;
+            c.ConvertedEqual(12.23m);
+            c.ConvertedEqual(decimal.MinValue);
+            c.ConvertedEqual(decimal.MaxValue);
+            c.ConvertedEqual(decimal.MinusOne);
+            c.ConvertedEqual(decimal.Zero);
+            c.ConvertedEqual(decimal.One);
         }
 
         [Test]
         public void CollectionConvert()
         {
-            var c = XConverter.BuiltIns[typeof(ICollection<>)];
+            var c = CollectionConverter.Default;
             var c0 = new HashSet<string>();
             var c1 = new List<object> { 978.44, Guid.NewGuid() };
-            var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, float.MaxValue }, { 4, c1 } };
+            //var c2 = new Dictionary<int, object> { { 1, "string item" }, { 2, 231 }, { 3, float.MaxValue }, { 4, c1 } };
             var c3 = new object[] { 22, "string" };
             //var c4 = new object[,] { { 33, "str", 'c' }, { 2212, 23.3f, Guid.NewGuid() } };
 
-            ConvertTest(c, c0);
-            ConvertTest(c, c1);
-            ConvertTest(c, c2, SettingsForByteValues);
-            ConvertTest(c, c3);
-            //ConvertTest(c, c4);
+            c.ConvertedEqual(c0, null, SequentialEqualityComparer<string>.Default);
+            c.ConvertedEqual(c1, null, SequentialEqualityComparer<object>.Default);
+            //c.ConvertedEqual(c2, null, SequentialEqualityComparer<KeyValuePair<int, object>>.Default);
+            c.ConvertedEqual(c3, null, SequentialEqualityComparer<object>.Default);
+            //c.ConvertedEqual(c4);
         }
 
         [Test]
         public void GuidConvert()
         {
-            var c = XConverter.BuiltIns[typeof(Guid)];
-            ConvertTest(c, Guid.Empty);
-            ConvertTest(c, Guid.NewGuid());
-            ConvertTest(c, Guid.NewGuid());
+            var c = GuidConverter.Default;
+            c.ConvertedEqual(Guid.Empty);
+            c.ConvertedEqual(Guid.NewGuid());
+            c.ConvertedEqual(Guid.NewGuid());
         }
 
         [Test]
         public void DateTimeConvert()
         {
-            var c = XConverter.BuiltIns[typeof(DateTime)];
-            ConvertTest(c, new DateTime());
-            ConvertTest(c, DateTime.Now);
-            ConvertTest(c, DateTime.UtcNow);
-            ConvertTest(c, DateTime.Today);
-            ConvertTest(c, DateTime.MinValue);
-            ConvertTest(c, DateTime.MaxValue);
-        }
-
-        public static void ConvertTest(XConverter converter, object value, XConvertSettings settings = null)
-        {
-            if (settings == null)
-                settings = XConvertSettings.Default;
-
-            var element = converter.ToXElement(value, "ConvertTest", settings);
-            var obj = converter.ToObject(element, settings);
-            Assert.AreEqual(value, obj);
+            var c = DateTimeConverter.Default;
+            c.ConvertedEqual(new DateTime());
+            c.ConvertedEqual(DateTime.Now);
+            c.ConvertedEqual(DateTime.UtcNow);
+            c.ConvertedEqual(DateTime.Today);
+            c.ConvertedEqual(DateTime.MinValue);
+            c.ConvertedEqual(DateTime.MaxValue);
         }
     }
 }

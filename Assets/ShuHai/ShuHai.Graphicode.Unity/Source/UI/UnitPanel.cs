@@ -30,7 +30,6 @@ namespace ShuHai.Graphicode.Unity.UI
 
         protected UnitPanel()
         {
-            _layouter = new Lazy<UnitPanelLayouter>(GetLayouter);
             _titleText = new Lazy<Text>(FindTitleText);
             _inputPortsRect = new Lazy<RectTransform>(FindInputPortsRect);
             _outputPortsRect = new Lazy<RectTransform>(FindOutputPortsRect);
@@ -173,21 +172,15 @@ namespace ShuHai.Graphicode.Unity.UI
 
         #region Child Components
 
-        private UnitPanelLayouter Layouter => _layouter.Value;
-
         private Text TitleText => _titleText.Value;
 
         private RectTransform InputPortsRect => _inputPortsRect.Value;
         private RectTransform OutputPortsRect => _outputPortsRect.Value;
 
-        private readonly Lazy<UnitPanelLayouter> _layouter;
-
         private readonly Lazy<Text> _titleText;
 
         private readonly Lazy<RectTransform> _inputPortsRect;
         private readonly Lazy<RectTransform> _outputPortsRect;
-
-        private UnitPanelLayouter GetLayouter() { return gameObject.GetComponent<UnitPanelLayouter>(); }
 
         private Text FindTitleText() { return gameObject.FindComponentInChild<Text>("Header/Title"); }
 

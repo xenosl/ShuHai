@@ -68,6 +68,24 @@ namespace ShuHai
             }
         }
 
+        public static Type GetBaseType(this Type self, int deriveDepth)
+        {
+            Ensure.Argument.NotNull(self, nameof(self));
+            if (deriveDepth < 0)
+                throw new ArgumentException("Derive depth can not be negative.", nameof(deriveDepth));
+
+            var type = self;
+            int depth = 0;
+            while (type != null)
+            {
+                if (depth == deriveDepth)
+                    return type;
+                type = type.BaseType;
+                depth++;
+            }
+            return null;
+        }
+
         /// <summary>
         ///     Get all interfaces of specified type and filter them by removing types those derived from any other.
         /// </summary>

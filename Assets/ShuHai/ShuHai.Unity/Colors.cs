@@ -3,13 +3,7 @@ using UnityEngine;
 
 namespace ShuHai.Unity
 {
-    public enum RGBAChannels
-    {
-        R,
-        G,
-        B,
-        A
-    }
+    public enum RGBAChannels { R, G, B, A }
 
     [Flags]
     public enum RGBAMasks

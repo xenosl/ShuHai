@@ -6,6 +6,8 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(DateTime))]
     public class DateTimeConverter : ValueConverter
     {
+        public new static DateTimeConverter Default { get; } = new DateTimeConverter();
+
         protected override string ValueToString(object value, XConvertSettings settings)
         {
             var dateTime = (DateTime)value;

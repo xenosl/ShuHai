@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6,63 +7,45 @@ using UnityEngine;
 
 namespace ShuHai.Unity
 {
-    /// <summary>
-    ///     Provides entry points of Unity events in fixed invocation order.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The Unity events (such as Awake, Start, Update, etc) is invoked in an undetermined order by default, users
-    ///         have to take care of in which order the custom scripts are executed by configure project settings to make
-    ///         sure the programme behaves the same each time in different software or hardware environment. This class
-    ///         invokes the event methods of its' components in a fixed order by default, thus the programme behaves the
-    ///         same in any environment.
-    ///     </para>
-    ///     <para>
-    ///         To take advantage of the class, implement the <see cref="IRootComponent" /> interface, the class is going
-    ///         to create an instance of the implemented type using the default constructor (in such case a default constructor
-    ///         is required).
-    ///     </para>
-    ///     <para>
-    ///         To change invocation order of specific type of component, apply <see cref="RootComponentAttribute" /> to
-    ///         that type and set <see cref="RootComponentAttribute.Priority" /> field. The greater priority value makes
-    ///         the instance of the type executes first, the same priority value makes the execution order undefined but
-    ///         determined every time in all situations.
-    ///     </para>
-    /// </remarks>
+    public struct LogInfo
+    {
+        public string Log;
+        public string StackTrack;
+        public LogType LotType;
+    }
+
     public static class Root
     {
         #region Life Cycle
 
-        public static event Action FixedUpdating;
-        public static event Action FixedUpdated;
-        public static event Action Updating;
-        public static event Action Updated;
-        public static event Action LateUpdating;
-        public static event Action LateUpdated;
+        public static event Action FixedUpdate;
+        public static event Action Update;
+        public static event Action LateUpdate;
 
-        internal static void Initialize() { InitializeComponents(); }
+        public static bool ApplicationQuiting { get; internal set; }
 
-        internal static void Deinitialize() { DeinitializeComponents(); }
-
-        internal static void FixedUpdate()
+        internal static void _Initialize()
         {
-            FixedUpdating?.Invoke();
-            ComponentFixedUpdate();
-            FixedUpdated?.Invoke();
+            InitializeLog();
+
+            CreateComponents();
         }
 
-        internal static void Update()
+        internal static void _Deinitialize()
         {
-            Updating?.Invoke();
-            ComponentsUpdate();
-            Updated?.Invoke();
+            DestroyComponents();
+
+            DeinitializeLog();
         }
 
-        internal static void LateUpdate()
+        internal static void _FixedUpdate() { FixedUpdate?.Invoke(); }
+
+        internal static void _Update() { Update?.Invoke(); }
+
+        internal static void _LateUpdate()
         {
-            LateUpdating?.Invoke();
-            ComponentLateUpdate();
-            LateUpdated?.Invoke();
+            LateUpdate?.Invoke();
+            LogLateUpdate();
         }
 
 #if UNITY_EDITOR
@@ -73,51 +56,63 @@ namespace ShuHai.Unity
 
 #endif // UNITY_EDITOR
 
+        public static Coroutine StartCoroutine(IEnumerator routine)
+        {
+            return RootBehaviour.Instance.StartCoroutine(routine);
+        }
+
+        public static void StopCoroutine(IEnumerator routine) { RootBehaviour.Instance.StopCoroutine(routine); }
+
         #endregion Life Cycle
 
         #region Components
 
-        public static IReadOnlyList<IRootComponent> Components => _components;
+        public static IReadOnlyList<MonoBehaviour> Components => _components;
 
         public static T GetComponent<T>()
-            where T : IRootComponent
+            where T : MonoBehaviour
         {
             return (T)_componentsByType.GetValue(typeof(T));
         }
 
-        public static IRootComponent GetComponent(Type type)
+        public static MonoBehaviour GetComponent(Type type)
         {
             Ensure.Argument.NotNull(type, nameof(type));
             Ensure.Argument.Is<IRootComponent>(type, nameof(type));
             return _componentsByType.GetValue(type);
         }
 
-        private static readonly List<IRootComponent> _components = new List<IRootComponent>();
+        private static readonly List<MonoBehaviour> _components = new List<MonoBehaviour>();
 
-        private static readonly Dictionary<Type, IRootComponent>
-            _componentsByType = new Dictionary<Type, IRootComponent>();
+        private static readonly Dictionary<Type, MonoBehaviour>
+            _componentsByType = new Dictionary<Type, MonoBehaviour>();
 
         #region Initialization
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void CreateComponents()
         {
             var types = ShuHai.Assemblies.Instances
                 .SelectMany(a => a.GetTypes())
-                .Where(IsValidTypeForComponentCreation)
+                .Where(IsComponentType)
                 .ToArray();
-            types.ForEach(VerifyComponentType);
 
-            _components.AddRange(types.Select(t => (IRootComponent)Activator.CreateInstance(t)));
+            _components.AddRange(types.Select(CreateComponent));
             _components.Sort(CompareComponent);
 
             foreach (var component in _components)
                 _componentsByType.Add(component.GetType(), component);
         }
 
-        private static bool IsValidTypeForComponentCreation(Type type)
+        private static MonoBehaviour CreateComponent(Type type)
+        {
+            return (MonoBehaviour)RootBehaviour.Instance.gameObject.AddComponent(type);
+        }
+
+        private static bool IsComponentType(Type type)
         {
             if (!typeof(IRootComponent).IsAssignableFrom(type))
+                return false;
+            if (!type.IsSubclassOf(typeof(Component)))
                 return false;
             if (type.IsAbstract)
                 return false;
@@ -126,7 +121,7 @@ namespace ShuHai.Unity
             return true;
         }
 
-        private static int CompareComponent(IRootComponent l, IRootComponent r)
+        private static int CompareComponent(MonoBehaviour l, MonoBehaviour r)
         {
             Type lt = l.GetType(), rt = r.GetType();
             var la = lt.GetCustomAttribute<RootComponentAttribute>();
@@ -141,51 +136,55 @@ namespace ShuHai.Unity
             return string.Compare(lt.FullName, rt.FullName, StringComparison.Ordinal);
         }
 
-        private static void VerifyComponentType(Type type)
+        #endregion Initialization
+
+        private static void DestroyComponents() { }
+
+        #endregion Components
+
+        #region Log
+
+        /// <summary>
+        ///     Log information of last unity's <see cref="LogType.Error" />, <see cref="LogType.Assert" /> or
+        ///     <see cref="LogType.Exception" /> message.
+        /// </summary>
+        public static LogInfo? LastErrorLog { get; set; }
+
+        /// <summary>
+        ///     Similar to <see cref="LastErrorLog" /> but clear at end of each frame.
+        /// </summary>
+        public static LogInfo? LastErrorLogInFrame { get; set; }
+
+        private static void InitializeLog() { Application.logMessageReceived += OnLogMessageReceived; }
+
+        private static void DeinitializeLog() { Application.logMessageReceived -= OnLogMessageReceived; }
+
+        private static void LogLateUpdate() { LastErrorLogInFrame = null; }
+
+        private static void OnLogMessageReceived(string log, string stackTrace, LogType type)
         {
-            if (type.GetDefaultConstructor() == null)
+            switch (type)
             {
-                throw new InvalidOperationException(
-                    $"A default constructor({type}) is required as Root Component.");
+                case LogType.Exception:
+                case LogType.Error:
+                case LogType.Assert:
+                    LastErrorLog = new LogInfo
+                    {
+                        Log = log,
+                        StackTrack = stackTrace,
+                        LotType = type
+                    };
+                    LastErrorLogInFrame = LastErrorLog;
+                    break;
+                case LogType.Warning:
+                    break;
+                case LogType.Log:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
-        #endregion Initialization
-
-        #region Events
-
-        private static void InitializeComponents()
-        {
-            foreach (var component in _components)
-                component.Initialize();
-        }
-
-        private static void DeinitializeComponents()
-        {
-            for (int i = _components.Count - 1; i >= 0; --i)
-                _components[i].Deinitialize();
-        }
-
-        private static void ComponentFixedUpdate()
-        {
-            foreach (var c in _components)
-                c.FixedUpdate();
-        }
-
-        private static void ComponentsUpdate()
-        {
-            foreach (var c in _components)
-                c.Update();
-        }
-
-        private static void ComponentLateUpdate()
-        {
-            foreach (var c in _components)
-                c.LateUpdate();
-        }
-
-        #endregion Events
-
-        #endregion Components
+        #endregion Log
     }
 }

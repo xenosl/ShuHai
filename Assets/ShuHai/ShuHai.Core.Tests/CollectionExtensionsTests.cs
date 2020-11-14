@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace ShuHai
+namespace ShuHai.Tests
 {
     public class CollectionExtensionsTests
     {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -11,18 +11,18 @@ namespace ShuHai.Unity.Editor
         /// </summary>
         public static string Name => _name.Value;
 
-        private static readonly Lazy<string> _name = new Lazy<string>(() => PathEx.NameOf(RootPath));
+        private static readonly Lazy<string> _name =
+            new Lazy<string>(() => PathEx.NameOf(Path.GetDirectoryName(AssetsPath)));
 
         #region Paths
 
         /// <summary>
-        ///     Root directory path of current project.
+        ///     The root directory path of current project.
         /// </summary>
-        public static string RootPath => _rootPath.Value;
+        public static string RootDirectory => _rootDirectory.Value;
 
         /// <summary>
         ///     The rooted path of "Assets" folder in project root directory.
-        ///     See <see cref="Application.dataPath" /> for more information.
         /// </summary>
         public static string AssetsPath => Application.dataPath;
 
@@ -46,14 +46,18 @@ namespace ShuHai.Unity.Editor
         /// </summary>
         public static string TempPath => _tempPath.Value;
 
-        private static readonly Lazy<string> _rootPath = new Lazy<string>(() => Path.GetDirectoryName(AssetsPath));
-        private static readonly Lazy<string> _libraryPath = new Lazy<string>(() => RootPath + "/Library");
+        private static readonly Lazy<string> _rootDirectory =
+            new Lazy<string>(() => Path.GetDirectoryName(AssetsPath));
+
+        private static readonly Lazy<string> _libraryPath = new Lazy<string>(() => RootDirectory + "/Library");
 
         private static readonly Lazy<string> _scriptAssembliesPath
             = new Lazy<string>(() => LibraryPath + "/ScriptAssemblies");
 
-        private static readonly Lazy<string> _settingsPath = new Lazy<string>(() => RootPath + "/ProjectSettings");
-        private static readonly Lazy<string> _tempPath = new Lazy<string>(() => RootPath + "/Temp");
+        private static readonly Lazy<string> _settingsPath =
+            new Lazy<string>(() => RootDirectory + "/ProjectSettings");
+
+        private static readonly Lazy<string> _tempPath = new Lazy<string>(() => RootDirectory + "/Temp");
 
         #endregion Paths
     }

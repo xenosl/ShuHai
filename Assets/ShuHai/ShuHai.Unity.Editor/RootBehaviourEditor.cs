@@ -1,43 +1,37 @@
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 
 namespace ShuHai.Unity.Editor
 {
     [CustomEditor(typeof(RootBehaviour))]
     public class RootBehaviourEditor : UnityEditor.Editor
     {
-        private void OnEnable() { InitializeComponents(); }
+        public MonoBehaviour Target => (MonoBehaviour)target;
 
-        private void OnDisable() { DeinitializeComponents(); }
+        private void OnEnable() { ScriptEnable(); }
+
+        private void OnDisable() { ScriptDisable(); }
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            ComponentsGUI();
+            ExecutionOrderGUI();
         }
 
-        #region Components
+        #region Script
 
-        private readonly List<RootComponentEditor> _componentEditors = new List<RootComponentEditor>();
+        public MonoScript Script { get; private set; }
 
-        private void InitializeComponents()
+        private void ScriptEnable() { Script = MonoScript.FromMonoBehaviour(Target); }
+
+        private void ScriptDisable() { Script = null; }
+
+        private void ExecutionOrderGUI()
         {
-            foreach (var component in Root.Components)
-            {
-                var editor = RootComponentEditor.Create(component);
-                if (editor != null)
-                    _componentEditors.Add(editor);
-            }
+            //var order = MonoImporter.GetExecutionOrder(Script);
         }
 
-        private void DeinitializeComponents() { _componentEditors.Clear(); }
-
-        private void ComponentsGUI()
-        {
-            foreach (var editor in _componentEditors)
-                editor.GUI();
-        }
-
-        #endregion Components
+        #endregion Script
     }
 }

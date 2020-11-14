@@ -11,11 +11,14 @@ namespace ShuHai.XConverts.Converters
     [XConvertType(typeof(ICollection<>))]
     public class CollectionConverter : XConverter
     {
+        public new static CollectionConverter Default { get; } = new CollectionConverter();
+
         #region Object To XElement
 
-        protected override void PopulateXAttributes(XElement element, object @object, XConvertSettings settings)
+        protected override void PopulateXElementAttributes(XElement element,
+            object @object, XConvertSettings settings, XConvertToXElementSession session)
         {
-            base.PopulateXAttributes(element, @object, settings);
+            base.PopulateXElementAttributes(element, @object, settings, session);
 
             if (@object.GetType().IsArray)
                 WriteArrayLengths(element, (Array)@object);
@@ -28,7 +31,7 @@ namespace ShuHai.XConverts.Converters
             var collection = (IEnumerable)@object;
             foreach (var item in collection)
             {
-                var converter = XConverterSelector.SelectWithBuiltins(settings.Converters, item, itemType);
+                var converter = settings.SelectConverter(item, itemType);
                 var childElement = converter.ToXElement(item, "Item", settings);
                 element.Add(childElement);
             }

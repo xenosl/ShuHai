@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace ShuHai.Reflection
 {
+    /// <summary>
+    ///     Encapsulates unified member access mechanism for properties and fields through reflection.
+    /// </summary>
     public class AssignableMember
     {
         public MemberInfo Info { get; }
@@ -81,7 +84,7 @@ namespace ShuHai.Reflection
         }
 
         public static MemberInfo GetInfo(Type type, string memberName,
-            BindingFlags bindingAttr = BindingAttributes.DeclareAll)
+            BindingFlags bindingAttr = BindingAttributes.All)
         {
             Ensure.Argument.NotNull(type, nameof(type));
             Ensure.Argument.NotNullOrEmpty(memberName, nameof(memberName));
@@ -110,31 +113,84 @@ namespace ShuHai.Reflection
             }
         }
 
+        public static bool IsValidMemberType(MemberTypes type)
+        {
+            switch (type)
+            {
+                case MemberTypes.Field:
+                case MemberTypes.Property:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         #region Instances
 
-        public static AssignableMember Get(Type type, string memberName,
-            BindingFlags bindingAttr = BindingAttributes.DeclareAll)
+        public static bool TryGet(Type type, string memberName, out AssignableMember member)
         {
-            return Get(GetInfo(type, memberName, bindingAttr));
+            return TryGet(type, memberName, BindingAttributes.All, out member);
+        }
+
+        public static bool TryGet(Type type, string memberName, BindingFlags bindingAttr, out AssignableMember member)
+        {
+            var (m, e) = GetImpl(type, memberName, bindingAttr);
+            member = m;
+            return e == null;
+        }
+
+        public static bool TryGet(MemberInfo info, out AssignableMember member)
+        {
+            Ensure.Argument.NotNull(info, nameof(info));
+
+            var (m, e) = GetImpl(info);
+            member = m;
+            return e == null;
+        }
+
+        public static AssignableMember Get(Type type, string memberName,
+            BindingFlags bindingAttr = BindingAttributes.All)
+        {
+            var (m, e) = GetImpl(type, memberName, bindingAttr);
+            if (e != null)
+                throw e;
+            return m;
         }
 
         public static AssignableMember Get(MemberInfo info)
         {
             Ensure.Argument.NotNull(info, nameof(info));
 
-            var mt = info.MemberType;
-            if (mt != MemberTypes.Field && mt != MemberTypes.Property)
+            var (m, e) = GetImpl(info);
+            if (e != null)
+                throw e;
+            return m;
+        }
+
+        private static (AssignableMember member, Exception exception) GetImpl(
+            Type type, string memberName, BindingFlags bindingAttr)
+        {
+            var info = GetInfo(type, memberName, bindingAttr);
+            return info == null
+                ? (null, new ArgumentException("Member with specified declare type and name not found."))
+                : GetImpl(info);
+        }
+
+        private static (AssignableMember member, Exception exception) GetImpl(MemberInfo info)
+        {
+            if (!IsValidMemberType(info.MemberType))
             {
-                throw new ArgumentException(
+                var e = new ArgumentException(
                     "Only field or property is considered as assignable member.", nameof(info));
+                return (null, e);
             }
 
-            if (!_instances.TryGetValue(info, out var am))
+            if (!_instances.TryGetValue(info, out var member))
             {
-                am = new AssignableMember(info);
-                _instances.Add(info, am);
+                member = new AssignableMember(info);
+                _instances.Add(info, member);
             }
-            return am;
+            return (member, null);
         }
 
         private static readonly Dictionary<MemberInfo, AssignableMember>
