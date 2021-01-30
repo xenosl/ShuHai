@@ -1,0 +1,20 @@
+{
+    "name": "ShuHai.I18N.Unity.Editor",
+    "references": [
+        "GUID:2f3f35f1347586048b0a7c361332f826",
+        "GUID:7d5984d1468cda74bb5453d971ae947e",
+        "GUID:443efd29eba0dfb4f95f6ebea06a9151",
+        "GUID:e92db19295a49be45b24ea776db65ff1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

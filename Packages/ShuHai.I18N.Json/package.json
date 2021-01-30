@@ -1,0 +1,11 @@
+{
+  "name": "shuhai.i18n.json",
+  "displayName": "ShuHai.I18N.Json",
+  "version": "1.0.0",
+  "unity": "2019.4",
+  "dependencies": {
+    "shuhai.core": "1.0.0",
+    "shuhai.i18n": "1.0.0",
+    "jillejr.newtonsoft.json-for-unity": "12.0.0"
+  }
+}

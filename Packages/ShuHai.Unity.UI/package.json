@@ -1,0 +1,10 @@
+{
+  "name": "shuhai.unity.ui",
+  "displayName": "ShuHai.Unity.UI",
+  "version": "1.0.0",
+  "unity": "2019.4",
+  "dependencies": {
+    "shuhai.core": "1.0.0",
+    "shuhai.unity": "1.0.0"
+  }
+}
