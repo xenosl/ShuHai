@@ -1,0 +1,8 @@
+{
+  "name": "excel-number-format",
+  "displayName": "ExcelNumberFormat",
+  "version": "1.1.0",
+  "unity": "2019.4",
+  "description": ".NET library to parse ECMA-376 number format strings and format values like Excel and other spreadsheet softwares.",
+  "type": "library"
+}

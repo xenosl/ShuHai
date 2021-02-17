@@ -5,6 +5,7 @@
   "unity": "2019.4",
   "dependencies": {
     "shuhai.core": "1.0.0",
-    "shuhai.graphicode": "1.0.0"
+    "shuhai.graphicode": "1.0.0",
+    "system.code-dom": "1.0.0"
   }
 }

@@ -44,7 +44,7 @@ namespace ShuHai.I18N.XlsxToJson
 
                         var path = Path.Combine(jsonDir, MakeJsonFileName(workbook.Name, sheet.Name));
                         var invalidCells = new List<Cell>();
-                        XlsxToJsonConvert.SheetToJsonFile(sheet, _columnDefinition, false, path);
+                        XlsxToJsonConvert.SheetToJsonFile(sheet, _sheetParser, true, path);
 
                         if (invalidCells.Count > 0)
                         {
@@ -66,10 +66,10 @@ namespace ShuHai.I18N.XlsxToJson
             }
         }
 
-        private static readonly ColumnDefinition _columnDefinition = new ColumnDefinition(new[]
+        private static readonly SheetParser _sheetParser = new SheetParser(new[]
         {
-            ("Key", CellValueType.String),
-            ("Text", CellValueType.String),
+            ("Key", (CellParser)new StringCellParser()),
+            ("Text", new StringCellParser()),
         });
 
         private static string MakeJsonFileName(string workbookName, string sheetName)

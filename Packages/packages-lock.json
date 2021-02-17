@@ -72,6 +72,26 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "excel-data-reader": {
+      "version": "file:ExcelDataReader.3.6.0",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "excel-data-reader.data-set": {
+      "version": "file:ExcelDataReader.DataSet.3.6.0",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "excel-data-reader": ""
+      }
+    },
+    "excel-number-format": {
+      "version": "file:ExcelNumberFormat.1.1.0",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "jillejr.newtonsoft.json-for-unity": {
       "version": "file:Newtonsoft.Json-for-Unity-12.0.301",
       "depth": 0,
@@ -106,7 +126,8 @@
       "source": "embedded",
       "dependencies": {
         "shuhai.core": "1.0.0",
-        "shuhai.graphicode": "1.0.0"
+        "shuhai.graphicode": "1.0.0",
+        "system.code-dom": "1.0.0"
       }
     },
     "shuhai.graphicode.unity": {
@@ -187,8 +208,15 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "shuhai.core": "1.0.0"
+        "shuhai.core": "1.0.0",
+        "excel-data-reader": ""
       }
+    },
+    "system.code-dom": {
+      "version": "file:System.CodeDom.5.0.0",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

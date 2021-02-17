@@ -1,0 +1,11 @@
+{
+  "name": "excel-data-reader.data-set",
+  "displayName": "ExcelDataReader.DataSet",
+  "version": "3.6.0",
+  "unity": "2019.4",
+  "description": "ExcelDataReader extension for reading Microsoft Excel files into System.Data.DataSet.",
+  "type": "library",
+  "dependencies": {
+    "excel-data-reader": ""
+  }
+}

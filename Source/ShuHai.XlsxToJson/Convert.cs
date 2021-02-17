@@ -26,9 +26,9 @@ namespace ShuHai.XlsxToJson
                 do
                 {
                     var sheet = new Sheet(workbook, sheets.Count, reader.Name);
+                    int rowIndex = 0;
                     while (reader.Read())
                     {
-                        int rowIndex = 0;
                         var row = new Row(rowIndex);
                         for (int colIndex = 0; colIndex < reader.FieldCount; ++colIndex)
                         {
@@ -49,25 +49,25 @@ namespace ShuHai.XlsxToJson
         }
 
         public static void SheetToJsonFile(Sheet sheet,
-            ColumnDefinition columnDefinition, string jsonPath, ICollection<Cell> invalidCells = null)
+            SheetParser parser, string jsonPath, ICollection<Cell> notParsedCells = null)
         {
-            SheetToJsonFile(sheet, columnDefinition, false, jsonPath, invalidCells);
+            SheetToJsonFile(sheet, parser, false, jsonPath, notParsedCells);
         }
 
         public static void SheetToJsonFile(Sheet sheet,
-            ColumnDefinition columnDefinition, bool ignoreFirstRow, string jsonPath,
-            ICollection<Cell> invalidCells = null)
+            SheetParser parser, bool ignoreFirstRow, string jsonPath,
+            ICollection<Cell> notParsedCells = null)
         {
-            var jsonObject = SheetToJson(sheet, columnDefinition, ignoreFirstRow, invalidCells);
+            var jsonObject = SheetToJson(sheet, parser, ignoreFirstRow, notParsedCells);
             var jsonText = jsonObject.ToString(Formatting.Indented);
             File.WriteAllText(jsonPath, jsonText);
         }
 
         public static JArray SheetToJson(Sheet sheet,
-            ColumnDefinition columnDefinition, bool ignoreFirstRow = false, ICollection<Cell> invalidCells = null)
+            SheetParser parser, bool ignoreFirstRow = false, ICollection<Cell> notParsedCells = null)
         {
             Ensure.Argument.NotNull(sheet, nameof(sheet));
-            Ensure.Argument.NotNull(columnDefinition, nameof(columnDefinition));
+            Ensure.Argument.NotNull(parser, nameof(parser));
 
             var json = new JArray();
             foreach (var row in sheet.Rows)
@@ -79,95 +79,22 @@ namespace ShuHai.XlsxToJson
                 foreach (var cell in row.Cells)
                 {
                     var value = cell.Value;
-                    if (!Index.IsValid(cell.ColumnIndex, columnDefinition.Count))
+                    if (!Index.IsValid(cell.ColumnIndex, parser.ColumnCount))
                     {
-                        invalidCells?.Add(cell);
+                        notParsedCells?.Add(cell);
                         continue;
                     }
 
-                    var def = columnDefinition[cell.ColumnIndex];
-                    var jsonValue = ParseJsonValue(value, def.ValueType, def.FallbackValue);
+                    var columnParser = parser[cell.ColumnIndex];
+                    var jsonValue = columnParser.Parse(value);
                     if (jsonValue != null)
-                        jsonRow[def.JsonKeyName] = jsonValue;
+                        jsonRow[columnParser.Name] = jsonValue;
                     else
-                        invalidCells?.Add(cell);
+                        notParsedCells?.Add(cell);
                 }
                 json.Add(jsonRow);
             }
             return json;
-        }
-
-        private static JValue ParseJsonValue(object value, CellValueType valueType, object fallbackValue)
-        {
-            switch (valueType)
-            {
-                case CellValueType.String:
-                    switch (value)
-                    {
-                        case DBNull _:
-                            return new JValue(fallbackValue);
-                        case string strValue:
-                            return new JValue(strValue);
-                    }
-                    break;
-                case CellValueType.Integer:
-                    switch (value)
-                    {
-                        case DBNull _:
-                            return new JValue(fallbackValue);
-                        case string strValue:
-                            if (int.TryParse(strValue, out var i))
-                                return new JValue(i);
-                            break;
-                        case int intValue:
-                            return new JValue(intValue);
-                    }
-                    break;
-                case CellValueType.Float:
-                    switch (value)
-                    {
-                        case DBNull _:
-                            return new JValue(fallbackValue);
-                        case string strValue:
-                            if (float.TryParse(strValue, out var f))
-                                return new JValue(f);
-                            break;
-                        case int intValue:
-                            return new JValue((double)intValue);
-                        case float floatValue:
-                            return new JValue(floatValue);
-                        case double doubleValue:
-                            return new JValue(doubleValue);
-                    }
-                    break;
-                case CellValueType.Boolean:
-                    switch (value)
-                    {
-                        case DBNull _:
-                            return new JValue(fallbackValue);
-                        case string strValue:
-                            if (bool.TryParse(strValue, out var b))
-                                return new JValue(b);
-                            break;
-                        case bool boolValue:
-                            return new JValue(boolValue);
-                    }
-                    break;
-                case CellValueType.Null:
-                    switch (value)
-                    {
-                        case DBNull _:
-                            return JValue.CreateNull();
-                        case string strValue:
-                            if (string.IsNullOrEmpty(strValue))
-                                return JValue.CreateNull();
-                            break;
-                    }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(valueType), valueType, null);
-            }
-            return null;
         }
     }
 }
