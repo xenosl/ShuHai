@@ -6,6 +6,8 @@ namespace ShuHai.I18N
 {
     public sealed class Language : IEquatable<Language>
     {
+        public string Name => CultureInfo.Name;
+
         public CultureInfo CultureInfo { get; }
 
         private Language(CultureInfo cultureInfo) { CultureInfo = cultureInfo; }
