@@ -1,11 +1,5 @@
 {
   "dependencies": {
-    "com.shuhai.newtonsoft.unity": {
-      "version": "file:Newtonsoft.Json.Unity",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.unity.collab-proxy": {
       "version": "1.2.16",
       "depth": 0,
@@ -94,6 +88,12 @@
     },
     "jillejr.newtonsoft.json-for-unity": {
       "version": "file:Newtonsoft.Json-for-Unity-12.0.301",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "jillejr.newtonsoft.json-for-unity.converters": {
+      "version": "file:Newtonsoft.Json-for-Unity.Converters-1.0.0",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
