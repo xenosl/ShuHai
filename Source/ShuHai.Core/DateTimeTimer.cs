@@ -11,21 +11,27 @@ namespace ShuHai
 
         public DateTime Time { get; }
 
-        public DateTimeTimer(DateTime time)
+        public DateTimeTimer(DateTime time, bool enabled = true)
         {
             Time = time;
             UpdateTimer();
+            Enabled = enabled;
         }
 
         private Timer _timer;
 
         private void UpdateTimer()
         {
-            var span = Time > DateTime.Now ? Time - DateTime.Now : TimeSpan.Zero;
-            _timer = new Timer(span.Milliseconds) { AutoReset = false };
+            var span = Time - DateTime.Now;
+            if (span <= TimeSpan.Zero)
+                span = new TimeSpan(0, 0, 0, 0, 1);
+
+            _timer = new Timer(span.TotalMilliseconds) { AutoReset = false };
             _timer.Elapsed += OnTimerElapsed;
         }
 
         private void OnTimerElapsed(object sender, ElapsedEventArgs e) { Elapsed?.Invoke(this, Time); }
+
+        public override string ToString() { return $"{GetType()}({Time})"; }
     }
 }
