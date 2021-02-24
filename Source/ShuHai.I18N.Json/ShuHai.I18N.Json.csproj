@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShuHai.I18N\ShuHai.I18N.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <OutputFiles Include="$(OutputPath)\ShuHai.I18N.Json.*" />
+  </ItemGroup>
+
+  <Target Name="CopyOutputFiles" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="@(OutputFiles)"
+          DestinationFolder="..\..\Packages\ShuHai.I18N.Json\Plugins"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

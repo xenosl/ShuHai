@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <OutputFiles Include="$(OutputPath)\ShuHai.Core.*" />
+  </ItemGroup>
+
+  <Target Name="CopyOutputFiles" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\..\Packages\ShuHai.Core\Plugins"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

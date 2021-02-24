@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShuHai.Graphicode\ShuHai.Graphicode.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CodeDom" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <OutputFiles Include="$(OutputPath)\ShuHai.Graphicode.Generator.*" />
+  </ItemGroup>
+
+  <Target Name="CopyOutputFiles" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="@(OutputFiles)"
+          DestinationFolder="..\..\Packages\ShuHai.Graphicode.Generator\Plugins"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
