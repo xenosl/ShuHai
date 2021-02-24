@@ -5,51 +5,45 @@
         public const int NanosecondsPerMicrosecond = 1000;
         public const int NanosecondsPerMillisecond = NanosecondsPerMicrosecond * MicrosecondsPerMillisecond;
         public const int NanosecondsPerSecond = NanosecondsPerMillisecond * MillisecondsPerSecond;
-        public const int NanosecondsPerTimeSpanTick = 100;
+        public const long NanosecondsPerMinute = (long)NanosecondsPerSecond * SecondsPerMinute;
+        public const long NanosecondsPerHour = NanosecondsPerMinute * MinutesPerHour;
+        public const long NanosecondsPerDay = NanosecondsPerHour * HoursPerDay;
+        public const long NanosecondsPerWeek = NanosecondsPerDay * DaysPerWeek;
 
         public const int MicrosecondsPerMillisecond = 1000;
         public const int MicrosecondsPerSecond = MicrosecondsPerMillisecond * MillisecondsPerSecond;
+        public const int MicrosecondsPerMinute = MicrosecondsPerSecond * SecondsPerMinute;
+        public const long MicrosecondsPerHour = (long)MicrosecondsPerMinute * MinutesPerHour;
+        public const long MicrosecondsPerDay = MicrosecondsPerHour * HoursPerDay;
+        public const long MicrosecondsPerWeek = MicrosecondsPerDay * DaysPerWeek;
 
         public const int MillisecondsPerSecond = 1000;
-        public const int MillisecondsPerMinute = SecondsPerMinute * MillisecondsPerSecond;
-        public const int MillisecondsPerHour = SecondsPerHour * MillisecondsPerSecond;
-        public const int MillisecondsPerDay = SecondsPerDay * MillisecondsPerSecond;
+        public const int MillisecondsPerMinute = MillisecondsPerSecond * SecondsPerMinute;
+        public const int MillisecondsPerHour = MillisecondsPerMinute * MinutesPerHour;
+        public const int MillisecondsPerDay = MillisecondsPerHour * HoursPerDay;
+        public const int MillisecondsPerWeek = MillisecondsPerDay * DaysPerWeek;
 
         public const int SecondsPerMinute = 60;
         public const int SecondsPerHour = SecondsPerMinute * MinutesPerHour;
         public const int SecondsPerDay = SecondsPerHour * HoursPerDay;
+        public const int SecondsPerWeek = SecondsPerDay * DaysPerWeek;
 
         public const int MinutesPerHour = 60;
         public const int MinutesPerDay = MinutesPerHour * HoursPerDay;
+        public const int MinutesPerWeek = MinutesPerDay * DaysPerWeek;
 
         public const int HoursPerDay = 24;
+        public const int HoursPerWeek = HoursPerDay * DaysPerWeek;
 
-        public const int TimeSpanTicksPerMicrosecond = NanosecondsPerMicrosecond / NanosecondsPerTimeSpanTick;
-        public const int TimeSpanTicksPerMillisecond = TimeSpanTicksPerMicrosecond * MicrosecondsPerMillisecond;
-        public const int TimeSpanTicksPerSecond = TimeSpanTicksPerMillisecond * MillisecondsPerSecond;
+        public const int DaysPerWeek = 7;
 
-
-        public static int MicrosecondsToTimeSpanTicks(int microseconds)
-        {
-            return microseconds * TimeSpanTicksPerMicrosecond;
-        }
-
-        public static int MillisecondsToTimeSpanTicks(int milliseconds)
-        {
-            return milliseconds * TimeSpanTicksPerMillisecond;
-        }
-
-        public static int SecondsToTimeSpanTicks(int seconds) { return seconds * TimeSpanTicksPerSecond; }
-
-        public static (int Days, int Hours, int Minutes, int Seconds, int Milliseconds)
-            MillisecondsToDayHourMinuteSecondMillisecond(long milliseconds)
-        {
-            int days = (int)(milliseconds / MillisecondsPerDay);
-            int hours = (int)(milliseconds % MillisecondsPerDay) / MillisecondsPerHour;
-            int minutes = (int)(milliseconds % MillisecondsPerHour) / MillisecondsPerMinute;
-            int seconds = (int)(milliseconds % MillisecondsPerMinute) / MillisecondsPerSecond;
-            int ms = (int)(milliseconds % MillisecondsPerSecond);
-            return (days, hours, minutes, seconds, ms);
-        }
+        public const int NanosecondsPerTick = 100;
+        public const int TicksPerMicrosecond = NanosecondsPerMicrosecond / NanosecondsPerTick;
+        public const int TicksPerMillisecond = TicksPerMicrosecond * MicrosecondsPerMillisecond;
+        public const int TicksPerSecond = TicksPerMillisecond * MillisecondsPerSecond;
+        public const int TicksPerMinute = TicksPerSecond * SecondsPerMinute;
+        public const long TicksPerHour = (long)TicksPerMinute * MinutesPerHour;
+        public const long TicksPerDay = TicksPerHour * HoursPerDay;
+        public const long TicksPerWeek = TicksPerDay * DaysPerWeek;
     }
 }
