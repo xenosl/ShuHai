@@ -4,30 +4,8 @@ using System.Linq;
 
 namespace ShuHai
 {
-    public class HashCode
+    public static class HashCode
     {
-        #region Value
-
-        public static implicit operator int(HashCode hc) { return hc.Value; }
-
-        public int Value;
-
-        public HashCode(int value) { Value = value; }
-
-        public HashCode Add(int value)
-        {
-            Value = Combine(Value, value);
-            return this;
-        }
-
-        public HashCode Add<T>(T obj)
-        {
-            Value = Combine(Value, Get(obj));
-            return this;
-        }
-
-        #endregion Value
-
         #region Gets
 
         public static int Get<T1, T2>(T1 o1, T2 o2) => Combine(Get(o1), Get(o2));
@@ -97,15 +75,5 @@ namespace ShuHai
         public static int Combine(IEnumerable<int> values) => values.Aggregate(Combine);
 
         #endregion Combine
-
-        #region Disabled Overrides
-
-#pragma warning disable 0809
-        [Obsolete("GetHashCode for HashCode struct is not available.", true)]
-        public override int GetHashCode() =>
-            throw new NotSupportedException("GetHashCode for HashCode struct is not available.");
-#pragma warning restore 0809
-
-        #endregion Disabled Overrides
     }
 }

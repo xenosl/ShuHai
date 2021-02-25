@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace ShuHai
@@ -9,39 +10,22 @@ namespace ShuHai
     public static class EnumTraits<T>
         where T : Enum
     {
-        public static readonly Type Type = typeof(T);
+        public static Type Type { get; } = typeof(T);
 
-        public static int ElementCount => _values.Count;
+        public static int ElementCount => Values.Count;
 
-        public static IReadOnlyList<string> Names => _names;
+        public static IReadOnlyList<string> Names { get; }
 
-        public static IReadOnlyList<T> Values => _values;
+        public static IReadOnlyList<T> Values { get; }
 
-        public static int IndexOf(T value) { return _valueIndices.GetValue(value, Index.Invalid); }
+        public static IReadOnlyDictionary<T, int> ValueToIndex { get; }
 
-        public static T GetValue(string name) { return _nameToValue[name]; }
+        public static IReadOnlyDictionary<string, int> NameToIndex { get; }
 
-        public static bool IsValid(string name) { return _nameToValue.ContainsKey(name); }
+        public static IReadOnlyDictionary<string, T> NameToValue { get; }
 
-        /// <summary>
-        ///     Get a value indicates whether the specified enum value is a valid element defined in <see cref="T" />.
-        /// </summary>
-        /// <param name="value">The value to test.</param>
-        /// <returns>
-        ///     <see langword="true" /> if the specified value is a valid value defined in <see cref="T" />; otherwise,
-        ///     <see langword="false" />.
-        /// </returns>
-        /// <remarks>
-        ///     A valid enum value means that the value equals any member of <see cref="T" /> and the value is not
-        ///     declared as obsoleted (which marked with <see cref="ObsoleteAttribute" />).
-        /// </remarks>
-        public static bool IsValid(T value) { return _valueToNames.ContainsKey(value); }
+        public static IReadOnlyDictionary<T, IReadOnlyCollection<string>> ValueToName { get; }
 
-        private static readonly Dictionary<string, T> _nameToValue = new Dictionary<string, T>();
-        private static readonly Dictionary<T, StringList> _valueToNames = new Dictionary<T, StringList>();
-        private static readonly StringList _names = new StringList();
-        private static readonly List<T> _values = new List<T>();
-        private static readonly Dictionary<T, int> _valueIndices = new Dictionary<T, int>();
 
         static EnumTraits()
         {
@@ -52,20 +36,35 @@ namespace ShuHai
                     nameToField.Add(f.Name, f);
             }
 
+            var names = new StringList();
+            var values = new List<T>();
+            var nameToValue = new Dictionary<string, T>();
+            var valueToName = new Dictionary<T, StringList>();
             foreach (string name in Enum.GetNames(Type))
             {
                 if (!nameToField.TryGetValue(name, out var field))
                     continue;
 
                 var value = (T)field.GetRawConstantValue();
-                _names.Add(name);
-                _values.Add(value);
-                _nameToValue.Add(name, value);
-                _valueToNames.Add(value, name);
+                names.Add(name);
+                values.Add(value);
+                nameToValue.Add(name, value);
+                valueToName.Add(value, name);
             }
+            Names = names;
+            Values = values;
+            NameToValue = nameToValue;
+            ValueToName = valueToName.ToDictionary(p => p.Key, p => (IReadOnlyCollection<string>)p.Value);
 
-            for (int i = 0; i < _values.Count; ++i)
-                _valueIndices.Add(_values[i], i);
+            var nameToIndex = new Dictionary<string, int>();
+            var valueToIndex = new Dictionary<T, int>();
+            for (int i = 0; i < Values.Count; ++i)
+            {
+                valueToIndex[Values[i]] = i; // Value may duplicate.
+                nameToIndex.Add(Names[i], i);
+            }
+            ValueToIndex = valueToIndex;
+            NameToIndex = nameToIndex;
         }
     }
 }
