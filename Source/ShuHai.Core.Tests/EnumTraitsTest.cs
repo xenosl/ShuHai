@@ -13,7 +13,7 @@ namespace ShuHai.Tests
             remove = 2, // 2
             Update = 3, // 3
             update = 3, // 4
-            Clear = 3, // 5
+            Clear = 4, // 5
         }
 
         [TestCase(0, ExpectedResult = "Add")]
@@ -32,13 +32,17 @@ namespace ShuHai.Tests
         [TestCase(5, ExpectedResult = TestEnum.Clear)]
         public TestEnum Values(int index) { return EnumTraits<TestEnum>.Values[index]; }
 
-        //[TestCase(TestEnum.Add, ExpectedResult = 0)]
-        //[TestCase(TestEnum.Remove, ExpectedResult = 1)]
-        //[TestCase(TestEnum.remove, ExpectedResult = 2)]
-        //[TestCase(TestEnum.Update, ExpectedResult = 3)]
-        //[TestCase(TestEnum.update, ExpectedResult = 4)]
-        [TestCase(TestEnum.Clear, ExpectedResult = 5)]
-        public int ValueToIndex(TestEnum value) { return EnumTraits<TestEnum>.ValueToIndex[value]; }
+        [TestCase(TestEnum.Add, 0)]
+        [TestCase(TestEnum.Remove, 1, 2)]
+        [TestCase(TestEnum.remove, 1, 2)]
+        [TestCase(TestEnum.Update, 3, 4)]
+        [TestCase(TestEnum.update, 3, 4)]
+        [TestCase(TestEnum.Clear, 5)]
+        public void ValueToIndices(TestEnum value, params int[] expectedIndices)
+        {
+            var indices = EnumTraits<TestEnum>.ValueToIndices[value];
+            CollectionAssert.AreEquivalent(expectedIndices, indices);
+        }
 
         [TestCase("Add", ExpectedResult = 0)]
         [TestCase("Remove", ExpectedResult = 1)]
@@ -56,6 +60,16 @@ namespace ShuHai.Tests
         [TestCase("Clear", ExpectedResult = TestEnum.Clear)]
         public static TestEnum NameToValue(string name) { return EnumTraits<TestEnum>.NameToValue[name]; }
 
-
+        [TestCase(TestEnum.Add, "Add")]
+        [TestCase(TestEnum.Remove, "Remove", "remove")]
+        [TestCase(TestEnum.remove, "Remove", "remove")]
+        [TestCase(TestEnum.Update, "Update", "update")]
+        [TestCase(TestEnum.update, "Update", "update")]
+        [TestCase(TestEnum.Clear, "Clear")]
+        public static void ValueToNames(TestEnum value, params string[] expectedNames)
+        {
+            var names = EnumTraits<TestEnum>.ValueToNames[value];
+            CollectionAssert.AreEquivalent(expectedNames, names);
+        }
     }
 }

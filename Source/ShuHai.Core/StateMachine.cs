@@ -97,7 +97,7 @@ namespace ShuHai
             internal void RiseExit(T src, T dst) { Exit?.Invoke(this, src, dst); }
         }
 
-        public StateEvent GetStateEvent(T state) { return _stateEvents[EnumTraits<T>.ValueToIndex[state]]; }
+        public StateEvent GetStateEvent(T state) { return _stateEvents[EnumTraits<T>.IndexOf(state)]; }
 
         private readonly StateEvent[] _stateEvents = new StateEvent[EnumTraits<T>.ElementCount];
 
@@ -169,10 +169,8 @@ namespace ShuHai
         /// </param>
         public Transition GetTransition(T? sourceState, T? destinationState)
         {
-            int srcIndex = sourceState.HasValue ? EnumTraits<T>.ValueToIndex[sourceState.Value] : Index.Invalid;
-            int dstIndex = destinationState.HasValue
-                ? EnumTraits<T>.ValueToIndex[destinationState.Value]
-                : Index.Invalid;
+            int srcIndex = sourceState.HasValue ? EnumTraits<T>.IndexOf(sourceState.Value) : Index.Invalid;
+            int dstIndex = destinationState.HasValue ? EnumTraits<T>.IndexOf(destinationState.Value) : Index.Invalid;
 
             if (sourceState.HasValue && destinationState.HasValue)
                 return _srcToDstTransitions[srcIndex, dstIndex];

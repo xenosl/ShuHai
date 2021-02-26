@@ -18,13 +18,23 @@ namespace ShuHai
 
         public static IReadOnlyList<T> Values { get; }
 
-        public static IReadOnlyDictionary<T, int> ValueToIndex { get; }
-
         public static IReadOnlyDictionary<string, int> NameToIndex { get; }
+
+        public static IReadOnlyDictionary<T, IReadOnlyCollection<int>> ValueToIndices { get; }
+
+        public static int IndexOf(T value)
+        {
+            return ValueToIndices.TryGetValue(value, out var indices) ? indices.First() : Index.Invalid;
+        }
 
         public static IReadOnlyDictionary<string, T> NameToValue { get; }
 
-        public static IReadOnlyDictionary<T, IReadOnlyCollection<string>> ValueToName { get; }
+        public static IReadOnlyDictionary<T, IReadOnlyCollection<string>> ValueToNames { get; }
+
+        public static string NameOf(T value)
+        {
+            return ValueToNames.TryGetValue(value, out var names) ? names.First() : string.Empty;
+        }
 
 
         static EnumTraits()
@@ -54,16 +64,16 @@ namespace ShuHai
             Names = names;
             Values = values;
             NameToValue = nameToValue;
-            ValueToName = valueToName.ToDictionary(p => p.Key, p => (IReadOnlyCollection<string>)p.Value);
+            ValueToNames = valueToName.ToDictionary(p => p.Key, p => (IReadOnlyCollection<string>)p.Value);
 
             var nameToIndex = new Dictionary<string, int>();
-            var valueToIndex = new Dictionary<T, int>();
+            var valueToIndices = new Dictionary<T, List<int>>();
             for (int i = 0; i < Values.Count; ++i)
             {
-                valueToIndex[Values[i]] = i; // Value may duplicate.
+                valueToIndices.Add(Values[i], i);
                 nameToIndex.Add(Names[i], i);
             }
-            ValueToIndex = valueToIndex;
+            ValueToIndices = valueToIndices.ToDictionary(p => p.Key, p => (IReadOnlyCollection<int>)p.Value);
             NameToIndex = nameToIndex;
         }
     }
