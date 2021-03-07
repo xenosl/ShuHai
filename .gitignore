@@ -62,6 +62,7 @@ crashlytics-build.properties
 *.sln.docstates
 
 # Files built by Visual Studio
+/.vsconfig
 *_i.c
 *_p.c
 *_h.h
