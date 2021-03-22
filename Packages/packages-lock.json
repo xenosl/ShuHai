@@ -168,6 +168,17 @@
         "shuhai.i18n": "1.0.0"
       }
     },
+    "shuhai.i18n.unity.ui": {
+      "version": "file:ShuHai.I18N.Unity.UI",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "shuhai.core": "1.0.0",
+        "shuhai.unity": "1.0.0",
+        "shuhai.i18n": "1.0.0",
+        "shuhai.i18n.unity": "1.0.0"
+      }
+    },
     "shuhai.n-octree": {
       "version": "file:ShuHai.NOctree",
       "depth": 0,
