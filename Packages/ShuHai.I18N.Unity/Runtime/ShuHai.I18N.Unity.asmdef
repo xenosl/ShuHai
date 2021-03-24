@@ -1,9 +1,7 @@
 {
     "name": "ShuHai.I18N.Unity",
     "references": [
-        "GUID:2f3f35f1347586048b0a7c361332f826",
-        "GUID:7d5984d1468cda74bb5453d971ae947e",
-        "GUID:3f07adbb11f3e144e9fc3353e6d3af05"
+        "GUID:7d5984d1468cda74bb5453d971ae947e"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
