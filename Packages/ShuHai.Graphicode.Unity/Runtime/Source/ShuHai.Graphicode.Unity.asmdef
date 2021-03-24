@@ -1,10 +1,8 @@
 {
     "name": "ShuHai.Graphicode.Unity",
     "references": [
-        "GUID:2f3f35f1347586048b0a7c361332f826",
         "GUID:7d5984d1468cda74bb5453d971ae947e",
-        "GUID:d02bc6ce72da53e4faad7160d7759e0c",
-        "GUID:30208a81155c14da9b3f0d41f5849ce0"
+        "GUID:d02bc6ce72da53e4faad7160d7759e0c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -13,5 +11,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

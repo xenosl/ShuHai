@@ -1,8 +1,6 @@
 {
     "name": "ShuHai.NOctree.Unity.Test",
     "references": [
-        "GUID:2f3f35f1347586048b0a7c361332f826",
-        "GUID:591883288985c874ba2a2f719e6746a7",
         "GUID:e7365eea45377414d92bc815432c1651"
     ],
     "includePlatforms": [

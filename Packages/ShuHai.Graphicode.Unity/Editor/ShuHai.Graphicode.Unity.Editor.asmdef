@@ -1,10 +1,7 @@
 {
     "name": "ShuHai.Graphicode.Unity.Editor",
     "references": [
-        "GUID:2f3f35f1347586048b0a7c361332f826",
-        "GUID:30208a81155c14da9b3f0d41f5849ce0",
         "GUID:afe5b2907c46449819d961a1e3a1d221",
-        "GUID:295bb97d6633945faa1a51b16abf276e",
         "GUID:7d5984d1468cda74bb5453d971ae947e",
         "GUID:443efd29eba0dfb4f95f6ebea06a9151"
     ],
@@ -17,5 +14,6 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

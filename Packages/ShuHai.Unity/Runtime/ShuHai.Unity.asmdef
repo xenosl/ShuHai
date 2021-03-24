@@ -1,8 +1,6 @@
 {
     "name": "ShuHai.Unity",
-    "references": [
-        "GUID:2f3f35f1347586048b0a7c361332f826"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
