@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShuHai
 {
@@ -35,5 +37,20 @@ namespace ShuHai
         }
 
         #endregion New
+
+        #region Modify
+
+        public static T[] Added<T>(this T[] self, IEnumerable<T> values)
+        {
+            var addLength = values.Count();
+            var newArray = new T[self.Length + addLength];
+            Array.Copy(self, newArray, self.Length);
+            int i = 0;
+            foreach (var value in values)
+                newArray[self.Length + i++] = value;
+            return newArray;
+        }
+
+        #endregion Modify
     }
 }

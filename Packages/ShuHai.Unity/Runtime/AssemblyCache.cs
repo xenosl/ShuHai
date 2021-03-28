@@ -3,9 +3,7 @@ using System.Reflection;
 
 namespace ShuHai.Unity
 {
-    using CoreAssemblies = ShuHai.Assemblies;
-
-    public static class Assemblies
+    public static class AssemblyCache
     {
         public const string PlayerAssemblyName = "Assembly-CSharp";
         public const string PlayerPluginsAssemblyName = "Assembly-CSharp-firstpass";
@@ -16,10 +14,10 @@ namespace ShuHai.Unity
         public static Assembly PlayerPlugins => _playerPlugins.Value;
 
         private static readonly Lazy<Assembly> _player =
-            new Lazy<Assembly>(() => CoreAssemblies.Get(PlayerAssemblyName));
+            new Lazy<Assembly>(() => ShuHai.AssemblyCache.Get(PlayerAssemblyName));
 
         private static readonly Lazy<Assembly> _playerPlugins =
-            new Lazy<Assembly>(() => CoreAssemblies.Get(PlayerPluginsAssemblyName));
+            new Lazy<Assembly>(() => ShuHai.AssemblyCache.Get(PlayerPluginsAssemblyName));
 
 #if UNITY_EDITOR
         public const string EditorAssemblyName = "Assembly-CSharp-Editor";
@@ -31,10 +29,10 @@ namespace ShuHai.Unity
         public static Assembly EditorPlugins => _editor.Value;
 
         private static readonly Lazy<Assembly> _editor =
-            new Lazy<Assembly>(() => CoreAssemblies.Get(EditorAssemblyName));
+            new Lazy<Assembly>(() => ShuHai.AssemblyCache.Get(EditorAssemblyName));
 
         private static readonly Lazy<Assembly> _editorPlugins =
-            new Lazy<Assembly>(() => CoreAssemblies.Get(EditorPluginsAssemblyName));
+            new Lazy<Assembly>(() => ShuHai.AssemblyCache.Get(EditorPluginsAssemblyName));
 #endif
     }
 }

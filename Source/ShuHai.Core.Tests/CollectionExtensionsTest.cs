@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace ShuHai.Tests
 {
-    public class CollectionExtensionsTests
+    public class CollectionExtensionsTest
     {
         public const int ListElementCount = 100;
 

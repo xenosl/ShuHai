@@ -55,7 +55,7 @@ namespace ShuHai.Graphicode.Unity.UI
 
         private void PopulateUnitList()
         {
-            var unitTypes = Assemblies.Instances
+            var unitTypes = AssemblyCache.Assemblies
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.IsSubclassOf(typeof(Unit)) && !t.IsAbstract)
                 .OrderBy(t => t.Namespace);

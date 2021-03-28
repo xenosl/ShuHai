@@ -24,9 +24,7 @@ namespace ShuHai.I18N.Unity
         private LanguageAsset[] _languageAssets;
 #pragma warning restore 649
 
-        void ISerializationCallbackReceiver.OnBeforeSerialize() { }
-
-        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        private void ApplyLanguageAssets()
         {
             if (CollectionUtil.IsNullOrEmpty(_languageAssets))
                 return;
@@ -44,5 +42,17 @@ namespace ShuHai.I18N.Unity
                 _languageAssetDict.Add(asset.LanguageName, asset);
             }
         }
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize() { }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize() { ApplyLanguageAssets(); }
+
+        #region Unity Events
+
+#if UNITY_EDITOR
+        private void OnValidate() { ApplyLanguageAssets(); }
+#endif
+
+        #endregion Unity Events
     }
 }

@@ -122,24 +122,15 @@ namespace ShuHai.Tests
 
         private class NestedGeneric<TKey, TValue> : IDictionary<TKey, TValue>
         {
-            public ICollection<TKey> Keys
-            {
-                get { return _dict.Keys; }
-            }
+            public ICollection<TKey> Keys => _dict.Keys;
 
-            public ICollection<TValue> Values
-            {
-                get { return _dict.Values; }
-            }
+            public ICollection<TValue> Values => _dict.Values;
 
             public NestedGeneric(Dictionary<TKey, TValue> dict) { this._dict = dict; }
 
             public void Clear() { _dict.Clear(); }
 
-            public int Count
-            {
-                get { return _dict.Count; }
-            }
+            public int Count => _dict.Count;
 
             public void Add(TKey key, TValue value) { _dict.Add(key, value); }
             public bool ContainsKey(TKey key) { return _dict.ContainsKey(key); }
@@ -148,8 +139,8 @@ namespace ShuHai.Tests
 
             public TValue this[TKey key]
             {
-                get { return _dict[key]; }
-                set { _dict[key] = value; }
+                get => _dict[key];
+                set => _dict[key] = value;
             }
 
             public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() { return _dict.GetEnumerator(); }

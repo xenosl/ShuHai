@@ -140,7 +140,7 @@ namespace ShuHai.Edit
         private static void ResetDefault()
         {
             var rootType = typeof(ObjectDataConverter);
-            var defaults = Assemblies.Instances.SelectMany(asm => asm.GetTypes())
+            var defaults = AssemblyCache.Assemblies.SelectMany(asm => asm.GetTypes())
                 .Where(t => rootType.IsAssignableFrom(t))
                 .Select(GetDefaultOrCreate)
                 .Where(c => c != null);

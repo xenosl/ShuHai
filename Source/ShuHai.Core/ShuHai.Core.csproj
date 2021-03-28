@@ -9,8 +9,7 @@
   </ItemGroup>
 
   <Target Name="CopyOutputFiles" AfterTargets="PostBuildEvent">
-    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\..\Packages\ShuHai.Core\Plugins"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(OutputFiles)" DestinationFolder="..\..\Packages\ShuHai.Core\Plugins" SkipUnchangedFiles="true" />
   </Target>
 
 </Project>

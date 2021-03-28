@@ -28,19 +28,21 @@ namespace ShuHai
         #region Cached Types
 
         public ITypeCollection AssignableTypes =>
-            _assignableTypes ?? (_assignableTypes = Type.EnumerateSelfAndDerivedTypes(SearchAssemblies).ToArray());
+            _assignableTypes ??
+            (_assignableTypes = Type.EnumerateSelfAndDerivedTypes(AssemblyCache.Assemblies).ToArray());
 
         /// <summary>
         ///     All derived types of current instance.
         /// </summary>
         public ITypeCollection DerivedTypes =>
-            _derivedTypes ?? (_derivedTypes = Type.EnumerateDerivedTypes(SearchAssemblies).ToArray());
+            _derivedTypes ?? (_derivedTypes = Type.EnumerateDerivedTypes(AssemblyCache.Assemblies).ToArray());
 
         /// <summary>
         ///     Derived types directly inherit from current instance.
         /// </summary>
         public ITypeCollection DirectDerivedTypes =>
-            _directDerivedTypes ?? (_directDerivedTypes = Type.EnumerateDirectDerivedTypes(SearchAssemblies).ToArray());
+            _directDerivedTypes ??
+            (_directDerivedTypes = Type.EnumerateDirectDerivedTypes(AssemblyCache.Assemblies).ToArray());
 
         /// <summary>
         ///     All the interfaces implemented or inherited by the current <see cref="Type" />.
@@ -62,7 +64,7 @@ namespace ShuHai
             {
                 if (_leastDerivedChildInterfaces == null)
                 {
-                    _leastDerivedChildInterfaces = SearchAssemblies.SelectMany(a => a.GetTypes())
+                    _leastDerivedChildInterfaces = AssemblyCache.Assemblies.SelectMany(a => a.GetTypes())
                         .Where(t => t.IsInterface && t.GetMostDerivedInterfaces().Contains(Type))
                         .ToList();
                 }
@@ -74,7 +76,8 @@ namespace ShuHai
         ///     All constructed types of this type. Only works if this type is a generic type definition.
         /// </summary>
         public ITypeCollection ConstructedTypes =>
-            _constructedTypes ?? (_constructedTypes = Type.EnumerateConstructedTypes(SearchAssemblies).ToArray());
+            _constructedTypes ??
+            (_constructedTypes = Type.EnumerateConstructedTypes(AssemblyCache.Assemblies).ToArray());
 
         private ITypeCollection _assignableTypes;
         private ITypeCollection _derivedTypes;
@@ -113,8 +116,8 @@ namespace ShuHai
         private void ClearCachedMembers() { _methods = null; }
 
         private const BindingFlags BindingAttrForAll = BindingFlags.DeclaredOnly |
-                                                       BindingFlags.Public | BindingFlags.NonPublic |
-                                                       BindingFlags.Static | BindingFlags.Instance;
+            BindingFlags.Public | BindingFlags.NonPublic |
+            BindingFlags.Static | BindingFlags.Instance;
 
         #endregion Cached Members
 
@@ -143,7 +146,7 @@ namespace ShuHai
 
         /// <summary>
         ///     Get certain type of specified name if it is already cached; otherwise search the type from
-        ///     <see cref="SearchAssemblies" />, get the the if exists or construct it if it is a generic type or an array.
+        ///     <see cref="AssemblyCache.Assemblies" />, get the the if exists or construct it if it is a generic type or an array.
         /// </summary>
         /// <param name="name">Full name of the type to get.</param>
         /// <param name="throwOnError"></param>
@@ -217,7 +220,7 @@ namespace ShuHai
 
         private static Type FindType(string name)
         {
-            foreach (var assembly in SearchAssemblies)
+            foreach (var assembly in AssemblyCache.Assemblies)
             {
                 if (assembly == null)
                     continue;
@@ -230,29 +233,33 @@ namespace ShuHai
 
         #endregion Types By Name
 
-        #region Search Assemblies
+        #region Types
 
-        private static IReadOnlyCollection<Assembly> SearchAssemblies
+        public static IReadOnlyCollection<Type> Types { get; private set; }
+
+        public static IReadOnlyDictionary<Type, IReadOnlyCollection<Type>> TypesByAttributeType { get; private set; }
+
+        private static void RefreshTypes()
         {
-            get
-            {
-                if (!_assemblyEventRegistered)
-                {
-                    Assemblies.Loaded += OnAssemblyLoad;
-                    _assemblyEventRegistered = true;
-                }
-                return Assemblies.Instances;
-            }
+            Types = AssemblyCache.Assemblies.SelectMany(a => a.GetTypes()).ToArray();
+            TypesByAttributeType = Types.ReadOnlyMembersByAttributeType();
         }
 
-        private static bool _assemblyEventRegistered;
+        #endregion Types
 
         private static void OnAssemblyLoad(Assembly assembly)
         {
+            RefreshTypes();
+
             foreach (var instance in _instances.Values)
                 instance.Clear();
         }
 
-        #endregion Search Assemblies
+        static TypeCache()
+        {
+            RefreshTypes();
+
+            AssemblyCache.AssemblyLoaded += OnAssemblyLoad;
+        }
     }
 }

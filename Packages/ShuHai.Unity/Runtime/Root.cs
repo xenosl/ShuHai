@@ -91,7 +91,7 @@ namespace ShuHai.Unity
 
         private static void CreateComponents()
         {
-            var types = ShuHai.Assemblies.Instances
+            var types = ShuHai.AssemblyCache.Assemblies
                 .SelectMany(a => a.GetTypes())
                 .Where(IsComponentType)
                 .ToArray();

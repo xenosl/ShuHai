@@ -5,11 +5,22 @@ using System.Text;
 namespace ShuHai
 {
     /// <summary>
-    ///     Represents type name information needed to make up the type.
+    ///     Collect all text information needed to locate a type.
     /// </summary>
     public sealed class TypeName : IEquatable<TypeName>
     {
-        public enum AssemblyNameFormat { Simple, Full }
+        public enum AssemblyNameFormat
+        {
+            /// <summary>
+            ///     Exclude assembly name from the name string.
+            /// </summary>
+            Simple,
+
+            /// <summary>
+            ///     Include assembly name in the name string.
+            /// </summary>
+            Full
+        }
 
         /// <summary>
         ///     Name of <see cref="System.Reflection.Assembly" /> which contains the type named by current instance, or
@@ -360,15 +371,15 @@ namespace ShuHai
 
         public static TypeName Get(string fullyQualifiedName)
         {
-            if (!instances.TryGetValue(fullyQualifiedName, out var name))
+            if (!_instances.TryGetValue(fullyQualifiedName, out var name))
             {
                 name = new TypeName(fullyQualifiedName);
-                instances.Add(fullyQualifiedName, name);
+                _instances.Add(fullyQualifiedName, name);
             }
             return name;
         }
 
-        private static readonly Dictionary<string, TypeName> instances = new Dictionary<string, TypeName>();
+        private static readonly Dictionary<string, TypeName> _instances = new Dictionary<string, TypeName>();
 
         #endregion Instances
 

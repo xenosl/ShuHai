@@ -37,7 +37,8 @@ namespace ShuHai.I18N.Unity.Editor
             if (GUILayout.Button("Add Language Folder"))
             {
                 var dir = EditorUtility.OpenFolderPanel("Select Language Folder", Project.AssetsPath, null);
-                AddLanguageAssetFolder(dir);
+                if (!string.IsNullOrEmpty(dir))
+                    AddLanguageAssetFolder(dir);
             }
         }
 
