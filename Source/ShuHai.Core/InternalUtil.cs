@@ -40,13 +40,18 @@ namespace ShuHai
             var dict = new Dictionary<Type, List<TMember>>();
             foreach (var member in members)
             {
-                foreach (var attribute in member.GetCustomAttributes<TAttribute>())
+                try
                 {
-                    if (resultFilter != null && !resultFilter(attribute, member))
-                        continue;
-                    var attributeType = attribute.GetType();
-                    dict.Add(attributeType, resultSelector(member, attributeType));
+                    // The method GetCustomAttributes may throw BadImageFormatException, ignore it.
+                    foreach (var attribute in member.GetCustomAttributes<TAttribute>())
+                    {
+                        if (resultFilter != null && !resultFilter(attribute, member))
+                            continue;
+                        var attributeType = attribute.GetType();
+                        dict.Add(attributeType, resultSelector(member, attributeType));
+                    }
                 }
+                catch (BadImageFormatException) { }
             }
             return dict;
         }
