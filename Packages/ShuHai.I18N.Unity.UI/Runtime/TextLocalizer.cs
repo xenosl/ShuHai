@@ -42,6 +42,8 @@ namespace ShuHai.I18N.Unity.UI
 
         #region Unity Events
 
+        private void Start() { ApplyTextKey(); }
+
 #if UNITY_EDITOR
         private void OnValidate() { ApplyTextKey(); }
 #endif
