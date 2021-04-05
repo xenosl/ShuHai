@@ -66,7 +66,7 @@ namespace ShuHai
         {
             int h = 0;
             foreach (var e in obj)
-                h = HashCode.Combine(h, e.GetHashCode());
+                h = Hash.Combine(h, e.GetHashCode());
             return h;
         }
     }

@@ -44,7 +44,7 @@ namespace ShuHai.XlsxToJson
 
             public override bool Equals(object obj) { return obj is Column other && Equals(other); }
 
-            public override int GetHashCode() { return HashCode.Combine(Owner.GetHashCode(), Index); }
+            public override int GetHashCode() { return Hash.Combine(Owner.GetHashCode(), Index); }
 
             public static bool operator ==(Column l, Column r) { return EqualityComparer<Column>.Default.Equals(l, r); }
             public static bool operator !=(Column l, Column r) { return !(l == r); }

@@ -22,7 +22,7 @@ namespace ShuHai.Graphicode
 
         public override bool Equals(object obj) { return obj is ConnectionKey other && Equals(other); }
 
-        public override int GetHashCode() { return HashCode.Get(Source, Destination); }
+        public override int GetHashCode() { return Hash.Calculate(Source, Destination); }
 
         public static bool operator ==(ConnectionKey l, ConnectionKey r) { return l.Equals(r); }
         public static bool operator !=(ConnectionKey l, ConnectionKey r) { return !(l == r); }

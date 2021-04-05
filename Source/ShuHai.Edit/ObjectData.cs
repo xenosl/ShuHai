@@ -51,7 +51,7 @@ namespace ShuHai.Edit
 
             public override bool Equals(object obj) { return obj is Member other && Equals(other); }
 
-            public override int GetHashCode() { return HashCode.Combine(Key.GetHashCode(), Value.GetHashCode()); }
+            public override int GetHashCode() { return Hash.Combine(Key.GetHashCode(), Value.GetHashCode()); }
 
             public static bool operator ==(Member l, Member r) { return l.Equals(r); }
             public static bool operator !=(Member l, Member r) { return !(l == r); }
@@ -67,7 +67,7 @@ namespace ShuHai.Edit
             for (int i = 0; i < Members.Count - 1; ++i)
             {
                 var m = Members[i];
-                h = HashCode.Combine(h, m.GetHashCode());
+                h = Hash.Combine(h, m.GetHashCode());
             }
             return h;
         }
@@ -173,7 +173,7 @@ namespace ShuHai.Edit
             return ReferenceEquals(this, obj) || obj is ObjectData other && Equals(other);
         }
 
-        public override int GetHashCode() { return HashCode.Combine(ObjectType.GetHashCode(), _membersHashCode); }
+        public override int GetHashCode() { return Hash.Combine(ObjectType.GetHashCode(), _membersHashCode); }
 
         public static bool operator ==(ObjectData l, ObjectData r) { return l?.Equals(r) ?? ReferenceEquals(r, null); }
         public static bool operator !=(ObjectData l, ObjectData r) { return !(l == r); }

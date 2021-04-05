@@ -366,7 +366,7 @@ namespace ShuHai
 
         public override bool Equals(object obj) { return obj is Interval<T> other && Equals(other); }
 
-        public override int GetHashCode() { return HashCode.Get(L, R); }
+        public override int GetHashCode() { return Hash.Calculate(L, R); }
 
         public static bool operator ==(Interval<T> x, Interval<T> y) { return x.Equals(y); }
         public static bool operator !=(Interval<T> x, Interval<T> y) { return !(x == y); }

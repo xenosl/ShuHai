@@ -182,7 +182,7 @@ namespace ShuHai.Edit
 
             private static int CalculateHashCode(IReadOnlyList<Data> dataList)
             {
-                return HashCode.Combine(dataList.Select(d => d.GetHashCode()));
+                return Hash.Combine(dataList.Select(d => d.GetHashCode()));
             }
         }
     }
