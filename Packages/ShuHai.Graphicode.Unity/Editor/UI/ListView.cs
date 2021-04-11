@@ -113,7 +113,7 @@ namespace ShuHai.Graphicode.Unity.Editor.UI
         {
             _itemListView.itemsSource = _items;
             _itemListView.bindItem = ItemListViewBindItem;
-            _itemListView.onSelectionChanged += OnSelectionChanged;
+            _itemListView.onSelectionChange += OnSelectionChanged;
         }
 
         private void RefreshItemListView() { _root.schedule.Execute(() => _itemListView.Refresh()); }
@@ -139,7 +139,7 @@ namespace ShuHai.Graphicode.Unity.Editor.UI
 
         public IReadOnlyList<T> Selections { get; private set; } = Array.Empty<T>();
 
-        private void OnSelectionChanged(List<object> value)
+        private void OnSelectionChanged(IEnumerable<object> value)
         {
             var old = Selections;
             Selections = value.Cast<T>().ToArray();
