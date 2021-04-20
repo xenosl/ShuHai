@@ -44,7 +44,7 @@ namespace ShuHai.I18N.XlsxToJson
 
                         var path = Path.Combine(jsonDir, MakeJsonFileName(workbook.Name, sheet.Name));
                         var invalidCells = new List<Cell>();
-                        XlsxToJsonConvert.SheetToJsonFile(sheet, _sheetParser, true, path);
+                        XlsxToJsonConvert.SheetToJsonFile(sheet, _sheetParser, true, path, invalidCells);
 
                         if (invalidCells.Count > 0)
                         {
