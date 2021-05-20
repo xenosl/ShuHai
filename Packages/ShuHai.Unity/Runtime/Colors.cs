@@ -226,6 +226,15 @@ namespace ShuHai.Unity
             return new Color32(ToByte(r), ToByte(g), ToByte(b), ToByte(a));
         }
 
+        public static Color32 New32(uint rgba)
+        {
+            var r = (byte)(rgba >> 24);
+            var g = (byte)(rgba >> 16);
+            var b = (byte)(rgba >> 8);
+            var a = (byte)rgba;
+            return new Color32(r, g, b, a);
+        }
+
         public static Color AlphaBlend(Color src, Color dst)
         {
             float invSrcA = 1 - src.a;

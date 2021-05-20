@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ShuHai.IMGUI
+namespace ShuHai.Unity.IMGUI
 {
     public struct GUIEnabledScope : IDisposable
     {

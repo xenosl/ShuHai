@@ -1,0 +1,19 @@
+{
+    "name": "ShuHai.Unity.Demo.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7d5984d1468cda74bb5453d971ae947e",
+        "GUID:14602c7f0d47b4633b557591f6554142"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
