@@ -29,6 +29,7 @@ namespace ShuHai.I18N.Unity
             if (CollectionUtil.IsNullOrEmpty(_languageAssets))
                 return;
 
+            _languageAssetDict.Clear();
             foreach (var asset in _languageAssets)
             {
                 if (string.IsNullOrEmpty(asset.LanguageName))

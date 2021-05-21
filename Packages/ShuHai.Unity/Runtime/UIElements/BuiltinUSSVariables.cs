@@ -154,6 +154,9 @@ namespace ShuHai.Unity.UIElements
             AddColor("--unity-colors-warning-text", 0xF4BC02FF, 0x333308FF);
 
             // window
+            AddColor("--unity-colors-window-background", 0x383838FF, 0xC8C8C8FF);
+            AddColor("--unity-colors-window-border", 0x242424FF, 0x939393FF);
+            AddColor("--unity-colors-window-text", 0xBDBDBDFF, 0x090909FF, 0x101010FF);
         }
 
         private static void AddColor(string name, uint darkTheme, uint lightTheme, uint? runtime = null)
@@ -178,10 +181,157 @@ namespace ShuHai.Unity.UIElements
 
         #endregion Colors
 
+        #region Icons
+
+        public static IReadOnlyDictionary<string, Texture2D> DarkThemeIcons => _darkThemeIcons;
+        public static IReadOnlyDictionary<string, Texture2D> LightThemeIcons => _lightThemeIcons;
+
+        private static readonly Dictionary<string, Texture2D> _darkThemeIcons = new Dictionary<string, Texture2D>();
+        private static readonly Dictionary<string, Texture2D> _lightThemeIcons = new Dictionary<string, Texture2D>();
+
+        private static void InitializeIcons()
+        {
+            AddIcon("--unity-icons-arrow_left",
+                "Builtin Skins/DarkSkin/Images/ArrowNavigationLeft.png",
+                "Builtin Skins/LightSkin/Images/ArrowNavigationLeft.png");
+            AddIcon("--unity-icons-arrow_right",
+                "Builtin Skins/DarkSkin/Images/ArrowNavigationRight.png",
+                "Builtin Skins/LightSkin/Images/ArrowNavigationRight.png");
+            AddIcon("--unity-icons-clear",
+                "UIPackageResources/Images/d_clear.png",
+                "UIPackageResources/Images/clear.png");
+            AddIcon("--unity-icons-color_picker",
+                "UIPackageResources/Images/d_color_picker.png",
+                "UIPackageResources/Images/color_picker.png");
+            AddIcon("--unity-icons-console_entry_error",
+                "Icons/d_console.erroricon.png",
+                "Icons/console.erroricon.png");
+            AddIcon("--unity-icons-console_entry_error_small",
+                "Icons/d_console.erroricon.sml.png",
+                "Icons/console.erroricon.sml.png");
+            AddIcon("--unity-icons-console_entry_info",
+                "Icons/d_console.infoicon.png",
+                "Icons/console.infoicon.png");
+            AddIcon("--unity-icons-console_entry_info_small",
+                "Icons/d_console.infoicon.sml.png",
+                "Icons/console.infoicon.sml.png");
+            AddIcon("--unity-icons-console_entry_warn",
+                "Icons/d_console.warnicon.png",
+                "Icons/console.warnicon.png");
+            AddIcon("--unity-icons-console_entry_warn_small	",
+                "Icons/d_console.warnicon.sml.png",
+                "Icons/console.warnicon.sml.png");
+            AddIcon("--unity-icons-dropdown",
+                "UIPackageResources/Images/d_dropdown.png",
+                "UIPackageResources/Images/dropdown.png");
+            AddIcon("--unity-icons-dropdown_toggle",
+                "UIPackageResources/Images/d_dropdown_toggle.png",
+                "UIPackageResources/Images/dropdown_toggle.png");
+            AddIcon("--unity-icons-foldout",
+                "UIPackageResources/Images/d_IN_foldout.png",
+                "UIPackageResources/Images/IN_foldout.png");
+            AddIcon("--unity-icons-foldout-checked",
+                "UIPackageResources/Images/d_IN_foldout_on.png",
+                "UIPackageResources/Images/IN_foldout_on.png");
+            AddIcon("--unity-icons-foldout-checked_focus",
+                "UIPackageResources/Images/d_IN_foldout_focus_on.png",
+                "UIPackageResources/Images/IN_foldout_focus_on.png");
+            AddIcon("--unity-icons-foldout-checked_pressed",
+                "UIPackageResources/Images/d_IN_foldout_act_on.png",
+                "UIPackageResources/Images/IN_foldout_act_on.png");
+            AddIcon("--unity-icons-foldout-focus",
+                "UIPackageResources/Images/d_IN_foldout_focus.png",
+                "UIPackageResources/Images/IN_foldout_focus.png");
+            AddIcon("--unity-icons-foldout-pressed",
+                "UIPackageResources/Images/d_IN_foldout_act.png",
+                "UIPackageResources/Images/IN_foldout_act.png");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+            //AddIcon("",
+            //    "",
+            //    "");
+        }
+
+        private static void AddIcon(string name, string darkThemePath, string lightThemePath)
+        {
+#if UNITY_EDITOR
+            AddEditorIcon(_darkThemeIcons, name, darkThemePath);
+            AddEditorIcon(_lightThemeIcons, name, lightThemePath);
+#endif
+        }
+
+#if UNITY_EDITOR
+        private static void AddEditorIcon(IDictionary<string, Texture2D> dict, string name, string path)
+        {
+            var icon = UnityEditor.Experimental.EditorResources.Load<Texture2D>(path);
+            if (!icon)
+            {
+                Debug.LogWarning($"Failed to load built-in icon '{path}'.");
+                return;
+            }
+            dict.Add(name, icon);
+        }
+#endif
+
+        #endregion Icons
+
         static BuiltinUSSVariables()
         {
             Metrics = InitializeMetrics();
             InitializeColors();
+            InitializeIcons();
         }
     }
 }

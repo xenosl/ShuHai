@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using UnityEngine;
 using UnityEngine.LowLevel;
 
 namespace ShuHai.Unity
