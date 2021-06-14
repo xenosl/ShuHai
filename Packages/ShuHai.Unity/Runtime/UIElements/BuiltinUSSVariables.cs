@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ShuHai.Unity.UIElements
@@ -85,10 +86,18 @@ namespace ShuHai.Unity.UIElements
             //AddColor("", );
 
             // box
-            //AddColor("", );
+            AddColor("--unity-colors-box-background", 0x28282840, 0x898989E6, 0xDEDEDEFF);
+            AddColor("--unity-colors-box-border", 0x00000000, 0x00000000, 0x555555FF);
 
             // button
-            //AddColor("", );
+            AddColor("--unity-colors-button-background", 0x585858FF, 0xE4E4E4FF, 0xE4E4E4FF);
+            AddColor("--unity-colors-button-background-focus", 0x6E6E6EFF, 0xBEBEBEFF);
+            AddColor("--unity-colors-button-background-hover", 0x676767FF, 0xECECECFF, 0xECECECFF);
+            AddColor("--unity-colors-button-background-pressed", 0x353535FF, 0xB1B1B1FF, 0x6F6F6FFF);
+            AddColor("--unity-colors-button-border", 0x303030FF, 0xB2B2B2FF);
+            AddColor("--unity-colors-button-border_accent", 0x242424FF, 0x939393FF);
+            AddColor("--unity-colors-button-border-pressed", 0x0D0D0DFF, 0x707070FF);
+            AddColor("--unity-colors-button-text", 0xEEEEEEFF, 0x090909FF, 0x101010FF);
 
             // default
             AddColor("--unity-colors-default-background", 0x282828FF, 0xA5A5A5FF);
@@ -100,11 +109,16 @@ namespace ShuHai.Unity.UIElements
             //AddColor("", );
 
             // error
-            //AddColor("", );
+            AddColor("--unity-colors-error-text", 0xD32222FF, 0x5A0000FF);
 
             // helpbox
 
             // highlight
+            AddColor("--unity-colors-highlight-background", 0x2C5D87FF, 0x3A72B0FF);
+            AddColor("--unity-colors-highlight-background-hover", 0xFFFFFF10, 0x00000010);
+            AddColor("--unity-colors-highlight-background-inactive", 0x4D4D4DFF, 0xAEAEAEFF);
+            AddColor("--unity-colors-highlight-text", 0x4C7EFFFF, 0x0032E6FF);
+            AddColor("--unity-colors-highlight-text-inactive", 0xFFFFFFFF, 0xFFFFFFFF);
 
             // input_field
 
@@ -245,63 +259,141 @@ namespace ShuHai.Unity.UIElements
             AddIcon("--unity-icons-foldout-pressed",
                 "UIPackageResources/Images/d_IN_foldout_act.png",
                 "UIPackageResources/Images/IN_foldout_act.png");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
-            //AddIcon("",
-            //    "",
-            //    "");
+            AddIcon("--unity-icons-link",
+                "Icons/d_UnLinked.png",
+                "Icons/UnLinked.png");
+            AddIcon("--unity-icons-link-checked",
+                "Icons/d_Linked.png",
+                "Icons/Linked.png");
+            AddIcon("--unity-icons-lock",
+                "Builtin Skins/DarkSkin/Images/IN LockButton.png",
+                "Builtin Skins/LightSkin/Images/IN LockButton.png");
+            AddIcon("--unity-icons-lock-checked",
+                "Builtin Skins/DarkSkin/Images/IN LockButton on.png",
+                "Builtin Skins/LightSkin/Images/IN LockButton on.png");
+            AddIcon("--unity-icons-lock-checked_pressed",
+                "Builtin Skins/DarkSkin/Images/IN LockButton on act.png",
+                "Builtin Skins/LightSkin/Images/IN LockButton on act.png");
+            AddIcon("--unity-icons-lock-pressed",
+                "Builtin Skins/DarkSkin/Images/IN LockButton act.png",
+                "Builtin Skins/LightSkin/Images/IN LockButton act.png");
+            AddIcon("--unity-icons-minus",
+                "UIPackageResources/Images/d_ol_minus.png",
+                "UIPackageResources/Images/ol_minus.png");
+            AddIcon("--unity-icons-minus-hover",
+                "UIPackageResources/Images/d_ol_minus_act.png",
+                "UIPackageResources/Images/ol_minus_act.png");
+            AddIcon("--unity-icons-pane_options",
+                "Builtin Skins/DarkSkin/Images/pane options.png",
+                "Builtin Skins/LightSkin/Images/pane options.png");
+            AddIcon("--unity-icons-picker",
+                "UIPackageResources/Images/d_pick.png",
+                "UIPackageResources/Images/pick.png");
+            AddIcon("--unity-icons-plus",
+                "UIPackageResources/Images/d_ol_plus.png",
+                "UIPackageResources/Images/ol_plus.png");
+            AddIcon("--unity-icons-plus-hover",
+                "UIPackageResources/Images/d_ol_plus_act.png",
+                "UIPackageResources/Images/ol_plus_act.png");
+            AddIcon("--unity-icons-profiler_timeline_digdown_arrow",
+                "Profiler/d_ProfilerTimelineDigDownArrow.png",
+                "Profiler/ProfilerTimelineDigDownArrow.png");
+            AddIcon("--unity-icons-profiler_timeline_rollup_arrow",
+                "Profiler/d_ProfilerTimelineRollUpArrow.png",
+                "Profiler/ProfilerTimelineRollUpArrow.png");
+            AddIcon("--unity-icons-pulldown",
+                "UIPackageResources/Images/d_dropdown.png",
+                "UIPackageResources/Images/dropdown.png");
+            AddIcon("--unity-icons-scroll_down",
+                "UIPackageResources/Images/d_scrolldown.png",
+                "UIPackageResources/Images/scrolldown.png");
+            AddIcon("--unity-icons-scroll_left",
+                "UIPackageResources/Images/d_scrollleft.png",
+                "UIPackageResources/Images/scrollleft.png");
+            AddIcon("--unity-icons-scroll_right",
+                "UIPackageResources/Images/d_scrollright.png",
+                "UIPackageResources/Images/scrollright.png");
+            AddIcon("--unity-icons-scroll_up",
+                "UIPackageResources/Images/d_scrollup.png",
+                "UIPackageResources/Images/scrollup.png");
+            AddIcon("--unity-icons-search",
+                "UIPackageResources/Images/d_search_icon.png",
+                "UIPackageResources/Images/search_icon.png");
+            AddIcon("--unity-icons-search_menu",
+                "UIPackageResources/Images/d_search_menu.png",
+                "UIPackageResources/Images/search_menu.png");
+            AddIcon("--unity-icons-shuriken_toggle-checked",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleNormalOn.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleNormalOn.png");
+            AddIcon("--unity-icons-shuriken_toggle-checked_focus",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleFocusedOn.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleFocusedOn.png");
+            AddIcon("--unity-icons-shuriken_toggle-checked_hover",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleHoverOn.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleHoverOn.png");
+            AddIcon("--unity-icons-shuriken_toggle_bg	",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleNormal.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleNormal.png");
+            AddIcon("--unity-icons-shuriken_toggle_bg-focus",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleFocused.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleFocused.png");
+            AddIcon("--unity-icons-shuriken_toggle_bg-focus_mixed",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleFocusedMixed.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleFocusedMixed.png");
+            AddIcon("--unity-icons-shuriken_toggle_bg-hover",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleHover.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleHover.png");
+            AddIcon("--unity-icons-shuriken_toggle_bg-hover_mixed",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleHoverMixed.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleHoverMixed.png");
+            AddIcon("--unity-icons-shuriken_toggle_bg-mixed",
+                "Builtin Skins/DarkSkin/Images/ShurikenToggleNormalMixed.png",
+                "Builtin Skins/LightSkin/Images/ShurikenToggleNormalMixed.png");
+            AddIcon("--unity-icons-toggle-checked",
+                "UIPackageResources/Images/d_toggle_on.png",
+                "UIPackageResources/Images/toggle_on.png");
+            AddIcon("--unity-icons-toggle-checked_focus",
+                "UIPackageResources/Images/d_toggle_on_focus.png",
+                "UIPackageResources/Images/toggle_on_focus.png");
+            AddIcon("--unity-icons-toggle-checked_hover",
+                "UIPackageResources/Images/d_toggle_on_hover.png",
+                "UIPackageResources/Images/toggle_on_hover.png");
+            AddIcon("--unity-icons-toggle-focus_mixed",
+                "UIPackageResources/Images/d_toggle_on_focus.png",
+                "UIPackageResources/Images/toggle_on_focus.png");
+            AddIcon("--unity-icons-toggle-hover_mixed",
+                "UIPackageResources/Images/d_toggle_on_hover.png",
+                "UIPackageResources/Images/toggle_on_hover.png");
+            AddIcon("--unity-icons-toggle-mixed",
+                "UIPackageResources/Images/d_toggle_on.png",
+                "UIPackageResources/Images/toggle_on.png");
+            AddIcon("--unity-icons-toggle_bg",
+                "UIPackageResources/Images/d_toggle_bg.png",
+                "UIPackageResources/Images/toggle_bg.png");
+            AddIcon("--unity-icons-toggle_bg-focus",
+                "UIPackageResources/Images/d_toggle_bg_focus.png",
+                "UIPackageResources/Images/toggle_bg_focus.png");
+            AddIcon("--unity-icons-toggle_bg-focus_mixed",
+                "UIPackageResources/Images/d_toggle_mixed_bg_focus.png",
+                "UIPackageResources/Images/toggle_mixed_bg_focus.png");
+            AddIcon("--unity-icons-toggle_bg-hover",
+                "UIPackageResources/Images/d_toggle_bg_hover.png",
+                "UIPackageResources/Images/toggle_bg_hover.png");
+            AddIcon("--unity-icons-toggle_bg-hover_mixed",
+                "UIPackageResources/Images/d_toggle_mixed_bg_hover.png",
+                "UIPackageResources/Images/toggle_mixed_bg_hover.png");
+            AddIcon("--unity-icons-toggle_bg-mixed",
+                "UIPackageResources/Images/d_toggle_mixed_bg.png",
+                "UIPackageResources/Images/toggle_mixed_bg.png");
+            AddIcon("--unity-icons-window_button_close",
+                "Icons/d_winbtn_win_close.png",
+                "Icons/winbtn_win_close.png");
+            AddIcon("--unity-icons-window_button_max",
+                "Icons/d_winbtn_win_max.png",
+                "Icons/winbtn_win_max.png");
+            AddIcon("--unity-icons-window_button_restore",
+                "Icons/d_winbtn_win_restore.png",
+                "Icons/winbtn_win_restore.png");
         }
 
         private static void AddIcon(string name, string darkThemePath, string lightThemePath)
@@ -315,13 +407,15 @@ namespace ShuHai.Unity.UIElements
 #if UNITY_EDITOR
         private static void AddEditorIcon(IDictionary<string, Texture2D> dict, string name, string path)
         {
-            var icon = UnityEditor.Experimental.EditorResources.Load<Texture2D>(path);
-            if (!icon)
+            try
             {
-                Debug.LogWarning($"Failed to load built-in icon '{path}'.");
-                return;
+                var icon = UnityEditor.Experimental.EditorResources.Load<Texture2D>(path);
+                dict.Add(name, icon);
             }
-            dict.Add(name, icon);
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+            }
         }
 #endif
 
