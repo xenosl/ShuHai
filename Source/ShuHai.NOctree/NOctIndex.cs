@@ -4,6 +4,7 @@ namespace ShuHai.NOctree
 {
     public readonly struct NOctIndex : IEquatable<NOctIndex>
     {
+        public static NOctIndex Zero { get; } = new NOctIndex();
         public static NOctIndex Invalid { get; } = new NOctIndex(Index.Invalid, Index.Invalid, Index.Invalid);
 
         public int I0 { get; }

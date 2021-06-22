@@ -29,7 +29,7 @@ namespace ShuHai.NOctree.Test
             NRankNode(3, 512, 8);
             NRankNode(4, 4096, 16);
         }
-        
+
         private static void NRankNode(int n, int childCapacity, int dimensionalChildCapacity)
         {
             var node = new NOctNode(n);
@@ -87,6 +87,26 @@ namespace ShuHai.NOctree.Test
             Assert.AreEqual(parent2, child2.Parent);
             Assert.AreEqual(child2, parent2[0, 1, 1]);
             Assert.AreEqual(2, parent2.ChildCount);
+        }
+
+        [Test]
+        public void Depth()
+        {
+            var root = new NOctNode(1);
+            var child1 = new NOctNode(1);
+            root.SetChild(NOctIndex.Zero, child1);
+            Assert.AreEqual(1, root.DepthOf(child1));
+            
+            var child2 = new NOctNode(1);
+            child1.SetChild(NOctIndex.Zero, child2);
+            Assert.AreEqual(1, child1.DepthOf(child2));
+            Assert.AreEqual(2, root.DepthOf(child2));
+            
+            var child3 = new NOctNode(1);
+            child2.SetChild(NOctIndex.Zero, child3);
+            Assert.AreEqual(1, child2.DepthOf(child3));
+            Assert.AreEqual(2, child1.DepthOf(child3));
+            Assert.AreEqual(3, root.DepthOf(child3));
         }
 
         [Test]

@@ -25,7 +25,7 @@ namespace ShuHai.NOctree
         public NOctNode(int n = 0)
         {
             if (n < 0)
-                throw new ArgumentException("Zero or positive value expected.", nameof(n));
+                throw new ArgumentException("Zero or positive value of N expected.", nameof(n));
 
             N = n;
             ChildCapacity = CalculateChildCapacity(n);
@@ -128,6 +128,32 @@ namespace ShuHai.NOctree
         public NOctNode this[int index0, int index1, int index2] => _children[index0, index1, index2];
 
         public NOctNode this[NOctIndex index] => _children[index.I0, index.I1, index.I2];
+
+        /// <summary>
+        ///     以当前节点为根节点，计算指定子节点的深度。
+        /// </summary>
+        /// <param name="child">需要计算的深度的子节点，该节点必须是当前节点的子节点。</param>
+        /// <returns>指定节点以当前节点为根节点时的深度值。</returns>
+        public int DepthOf(NOctNode child)
+        {
+            if (child == null)
+                throw new ArgumentNullException(nameof(child));
+            if (IsLeaf)
+                throw new InvalidOperationException("The current node does not contains any child.");
+
+            int depth = 0;
+            var p = child;
+            while (p != null)
+            {
+                if (p == this)
+                    break;
+                depth++;
+                p = p.Parent;
+            }
+            if (p == null)
+                throw new ArgumentException("The specified node is not child of current node.", nameof(child));
+            return depth;
+        }
 
         public void SetChild(NOctIndex index, NOctNode child)
         {
