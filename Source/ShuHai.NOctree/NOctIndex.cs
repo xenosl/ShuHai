@@ -2,13 +2,13 @@
 
 namespace ShuHai.NOctree
 {
-    public struct NOctIndex : IEquatable<NOctIndex>
+    public readonly struct NOctIndex : IEquatable<NOctIndex>
     {
-        public static NOctIndex Zero { get; } = new NOctIndex();
+        public static NOctIndex Invalid { get; } = new NOctIndex(Index.Invalid, Index.Invalid, Index.Invalid);
 
-        public int I0;
-        public int I1;
-        public int I2;
+        public int I0 { get; }
+        public int I1 { get; }
+        public int I2 { get; }
 
         public NOctIndex(int i0, int i1, int i2)
         {
@@ -17,11 +17,11 @@ namespace ShuHai.NOctree
             I2 = i2;
         }
 
-        public bool IsValid(int segmentCount)
+        public bool IsValid(int dimensionalChildCapacity)
         {
-            return Index.IsValid(I0, segmentCount)
-                && Index.IsValid(I1, segmentCount)
-                && Index.IsValid(I2, segmentCount);
+            return Index.IsValid(I0, dimensionalChildCapacity)
+                   && Index.IsValid(I1, dimensionalChildCapacity)
+                   && Index.IsValid(I2, dimensionalChildCapacity);
         }
 
         public bool Equals(NOctIndex other) { return I0 == other.I0 && I1 == other.I1 && I2 == other.I2; }
