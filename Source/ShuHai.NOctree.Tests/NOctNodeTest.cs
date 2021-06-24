@@ -30,13 +30,13 @@ namespace ShuHai.NOctree.Test
             NRankNode(4, 4096, 16);
         }
 
-        private static void NRankNode(int n, int childCapacity, int dimensionalChildCapacity)
+        private static void NRankNode(int n, int expectedChildCapacity, int expectedDimensionalChildCapacity)
         {
             var node = new NOctNode(n);
             Assert.AreEqual(n, node.N);
             Assert.AreEqual(0, node.ChildCount);
-            Assert.AreEqual(childCapacity, node.ChildCapacity);
-            Assert.AreEqual(dimensionalChildCapacity, node.DimensionalChildCapacity);
+            Assert.AreEqual(expectedChildCapacity, node.ChildCapacity);
+            Assert.AreEqual(expectedDimensionalChildCapacity, node.DimensionalChildCapacity);
 
             Assert.AreEqual(NOctIndex.Invalid, node.Index);
 
@@ -44,7 +44,7 @@ namespace ShuHai.NOctree.Test
             Assert.IsTrue(node.IsRoot);
             Assert.AreEqual(node, node.FindRoot());
 
-            Assert.IsFalse(node.IsLeaf);
+            Assert.IsTrue(node.IsLeaf);
         }
 
         [Test]
@@ -90,18 +90,18 @@ namespace ShuHai.NOctree.Test
         }
 
         [Test]
-        public void Depth()
+        public void DepthOfChild()
         {
             var root = new NOctNode(1);
-            var child1 = new NOctNode(1);
+            var child1 = new NOctNode(2);
             root.SetChild(NOctIndex.Zero, child1);
             Assert.AreEqual(1, root.DepthOf(child1));
-            
-            var child2 = new NOctNode(1);
+
+            var child2 = new NOctNode(3);
             child1.SetChild(NOctIndex.Zero, child2);
             Assert.AreEqual(1, child1.DepthOf(child2));
             Assert.AreEqual(2, root.DepthOf(child2));
-            
+
             var child3 = new NOctNode(1);
             child2.SetChild(NOctIndex.Zero, child3);
             Assert.AreEqual(1, child2.DepthOf(child3));
@@ -110,17 +110,43 @@ namespace ShuHai.NOctree.Test
         }
 
         [Test]
-        public void NInParent()
+        public void RankOfChild()
         {
-            // var root = new NOctNode(1);
-            // var node = new NOctNode(2);
-            // root.SetChild(NOctIndex.Zero, node);
-            // var child = new NOctNode();
-            // node.SetChild(NOctIndex.Zero, child);
+            var root = new NOctNode(1);
+            var child1 = new NOctNode(2);
+            root.SetChild(NOctIndex.Zero, child1);
+            Assert.AreEqual(1, root.RankOf(child1));
+
+            var child2 = new NOctNode(3);
+            child1.SetChild(NOctIndex.Zero, child2);
+            Assert.AreEqual(2, child1.RankOf(child2));
+            Assert.AreEqual(3, root.RankOf(child2));
+
+            var child3 = new NOctNode(1);
+            child2.SetChild(NOctIndex.Zero, child3);
+            Assert.AreEqual(3, child2.RankOf(child3));
+            Assert.AreEqual(5, child1.RankOf(child3));
+            Assert.AreEqual(6, root.RankOf(child3));
+        }
+
+        [Test]
+        public void IndexOfChild()
+        {
+            var root = new NOctNode(1);
+            var child1 = new NOctNode(2);
+            root.SetChild(new NOctIndex(1, 0, 1), child1);
+            Assert.AreEqual(child1.Index, root.IndexOf(child1));
+            
+            // var child2 = new NOctNode(3);
+            // child1.SetChild(new NOctIndex(2, 1, 3), child2);
+            // Assert.AreEqual(new NOctIndex(2, 3, 5), child1.IndexOf(child2));
+            // Assert.AreEqual(new NOctIndex(4 * 1 + 2, 4 * 0 + 1, 4 * 1 + 3), root.IndexOf(child2));
             //
-            // Assert.AreEqual(1, node.NInParent(root));
-            // Assert.AreEqual(2, child.NInParent(node));
-            // Assert.AreEqual(3, child.NInParent(root));
+            // var child3 = new NOctNode(1);
+            // child2.SetChild(new NOctIndex(0, 1, 1), child3);
+            // Assert.AreEqual(new NOctIndex(0, 1, 1), child2.IndexOf(child3));
+            // Assert.AreEqual(new NOctIndex(), child1.IndexOf(child3));
+            // Assert.AreEqual(new NOctIndex(), root.IndexOf(child3));
         }
     }
 }

@@ -42,5 +42,10 @@ namespace ShuHai.NOctree
 
         public static bool operator ==(NOctIndex l, NOctIndex r) { return l.Equals(r); }
         public static bool operator !=(NOctIndex l, NOctIndex r) { return !(l == r); }
+
+        public override string ToString()
+        {
+            return $"{nameof(NOctIndex)}({I0},{I1},{I2})";
+        }
     }
 }

@@ -28,8 +28,8 @@ namespace ShuHai.NOctree
                 throw new ArgumentException("Zero or positive value of N expected.", nameof(n));
 
             N = n;
-            ChildCapacity = CalculateChildCapacity(n);
-            DimensionalChildCapacity = CalculateDimensionalChildCapacity(ChildCapacity);
+            ChildCapacity = EvaluateChildCapacity(n);
+            DimensionalChildCapacity = EvaluateDimensionalChildCapacity(ChildCapacity);
             _children = new NOctNode[DimensionalChildCapacity, DimensionalChildCapacity, DimensionalChildCapacity];
         }
 
@@ -73,6 +73,97 @@ namespace ShuHai.NOctree
             return node.IsChildOf(this);
         }
 
+        /// <summary>
+        ///     以当前节点为根节点，计算指定子节点的深度。
+        /// </summary>
+        /// <param name="child">需要计算的深度的子节点，该节点必须是当前节点的子节点。</param>
+        /// <returns>指定节点以当前节点为根节点时的深度值。</returns>
+        public int DepthOf(NOctNode child)
+        {
+            if (child == null)
+                throw new ArgumentNullException(nameof(child));
+
+            int depth = 0;
+            var p = child;
+            while (p != null)
+            {
+                if (p == this)
+                    break;
+                depth++;
+                p = p.Parent;
+            }
+            if (p == null)
+                throw new ArgumentException("The specified node is not child of current node.", nameof(child));
+            return depth;
+        }
+
+        /// <summary>
+        ///     以当前节点为根节点，计算指定子节点所在的阶数。
+        /// </summary>
+        /// <param name="child">需要计算的深度的子节点，该节点必须是当前节点的子节点。</param>
+        /// <returns>指定节点以当前节点为根节点时的阶数值。</returns>
+        public int RankOf(NOctNode child)
+        {
+            if (child == null)
+                throw new ArgumentNullException(nameof(child));
+
+            var n = 0;
+            var p = child.Parent;
+            while (p != null)
+            {
+                n += p.N;
+                if (p == this)
+                    break;
+                p = p.Parent;
+            }
+            if (p == null)
+                throw new ArgumentException("The specified node is not child of current node.", nameof(child));
+            return n;
+        }
+
+        /// <summary>
+        ///     计算指定子节点在没有中间子节点（但合并中间子节点的阶数）的情况下在当前节点中的索引。
+        /// </summary>
+        public NOctIndex IndexOf(NOctNode child)
+        {
+            if (child == null)
+                throw new ArgumentNullException(nameof(child));
+            if (IsLeaf)
+                throw new InvalidOperationException("Unable to evaluate child index from a leaf node.");
+
+            var index = child.Index;
+            var c = child;
+            var p = c.Parent;
+            while (p != null)
+            {
+                if (p == this)
+                    break;
+
+                var n = p.RankOf(child);
+                var dc = EvaluateDimensionalChildCapacity(EvaluateChildCapacity(n));
+                var i = IndexMultiply(p.Index, dc);
+                index = IndexPlus(index, i);
+
+                c = p;
+                p = c.Parent;
+            }
+
+            if (p == null)
+                throw new ArgumentException("The specified node is not child of current node.", nameof(child));
+
+            return index;
+        }
+
+        private static NOctIndex IndexPlus(NOctIndex l, NOctIndex r)
+        {
+            return new NOctIndex(l.I0 + r.I0, l.I1 + r.I1, l.I2 + r.I2);
+        }
+
+        private static NOctIndex IndexMultiply(NOctIndex index, int scaler)
+        {
+            return new NOctIndex(index.I0 * scaler, index.I1 * scaler, index.I2 * scaler);
+        }
+
         #region Parents
 
         public bool IsRoot => Parent == null;
@@ -106,9 +197,9 @@ namespace ShuHai.NOctree
         public int DimensionalChildCapacity { get; }
 
         /// <summary>
-        ///     是否是叶子节点，即当前节点是否不存在子节点。
+        ///     是否是叶子节点，即当前节点是否不可容纳子节点。
         /// </summary>
-        public bool IsLeaf => ChildCapacity == 0;
+        public bool IsLeaf => _childSet.Count == 0;
 
         /// <summary>
         ///     当前节点最大可容纳的子节点数。
@@ -129,31 +220,6 @@ namespace ShuHai.NOctree
 
         public NOctNode this[NOctIndex index] => _children[index.I0, index.I1, index.I2];
 
-        /// <summary>
-        ///     以当前节点为根节点，计算指定子节点的深度。
-        /// </summary>
-        /// <param name="child">需要计算的深度的子节点，该节点必须是当前节点的子节点。</param>
-        /// <returns>指定节点以当前节点为根节点时的深度值。</returns>
-        public int DepthOf(NOctNode child)
-        {
-            if (child == null)
-                throw new ArgumentNullException(nameof(child));
-            if (IsLeaf)
-                throw new InvalidOperationException("The current node does not contains any child.");
-
-            int depth = 0;
-            var p = child;
-            while (p != null)
-            {
-                if (p == this)
-                    break;
-                depth++;
-                p = p.Parent;
-            }
-            if (p == null)
-                throw new ArgumentException("The specified node is not child of current node.", nameof(child));
-            return depth;
-        }
 
         public void SetChild(NOctIndex index, NOctNode child)
         {
@@ -228,54 +294,14 @@ namespace ShuHai.NOctree
 
         #endregion Children
 
-        #endregion Hierarchy
+        private static int EvaluateChildCapacity(int n) { return n > 0 ? Convert.ToInt32(Math.Pow(8, n)) : 0; }
 
-        #region Utilities
-
-        /// <summary>
-        ///     计算：假如当前子节点为指定父节点的直接子节点（即中间没有其他父节点），那么指定父节点的N值应该是多少。
-        /// </summary>
-        public int NInParent(NOctNode parent)
-        {
-            Ensure.Argument.NotNull(parent, nameof(parent));
-            if (IsRoot)
-                throw new InvalidOperationException("Any parent expected.");
-
-            int n = 0;
-            var p = Parent;
-            while (p != null)
-            {
-                n += p.N;
-                if (p == parent)
-                    break;
-                p = p.Parent;
-            }
-            if (p == null)
-                throw new ArgumentException("Parent node expected.", nameof(parent));
-
-            return n;
-        }
-
-        /// <summary>
-        ///     假如将指定父节点以当前节点所在的层级进行分割，当前节点在其中的位置索引。
-        /// </summary>
-        public void IndexInParent(NOctNode parent, out int index0, out int index1, out int index2)
-        {
-            Ensure.Argument.NotNull(parent, nameof(parent));
-            if (IsRoot)
-                throw new InvalidOperationException("Any parent expected.");
-
-            throw new NotImplementedException();
-        }
-
-        private static int CalculateChildCapacity(int n) { return n > 0 ? Convert.ToInt32(Math.Pow(8, n)) : 0; }
-
-        private static int CalculateDimensionalChildCapacity(int childCapacity)
+        private static int EvaluateDimensionalChildCapacity(int childCapacity)
         {
             return childCapacity > 0 ? Convert.ToInt32(Math.Pow(childCapacity, 1.0 / 3.0)) : 0;
         }
 
-        #endregion Utilities
+        #endregion Hierarchy
 
         #region IReadOnlyCollection
 
