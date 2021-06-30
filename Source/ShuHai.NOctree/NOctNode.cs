@@ -9,8 +9,9 @@ namespace ShuHai.NOctree
     ///     表示一个可向上和向下扩展的N阶八叉树的节点。N阶八叉树表示子节点为8^N个的八叉树。
     /// </summary>
     /// <remarks>
-    ///     由于所有节点只有在需要时才会创建，只要有意控制每个节点的子节点的数量（由<see cref="N" />控制）即可在表示
-    ///     无限大空间时有效控制内存大小，也就是控制用于表示子节点的数组（<see cref="NOctNode._children" />）中的内容多少。
+    ///     由于所有节点只有在需要时才会创建，只要有意控制每个节点的子节点的数量（由<see cref="N" />控制）即可在表示无限大空间时有效控制内存大
+    ///     小，也就是（通过<see cref="NOctNode.SetChild(int,int,int,NOctNode)" />）控制用于表示子节点的集合（<see cref="NOctNode.Children" />
+    ///     ）中的内容多少。
     /// </remarks>
     public class NOctNode : IReadOnlyCollection<NOctNode>
     {
