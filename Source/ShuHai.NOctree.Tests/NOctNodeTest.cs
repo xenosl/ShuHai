@@ -92,21 +92,21 @@ namespace ShuHai.NOctree.Test
         [Test]
         public void DepthOfChild()
         {
-            var root = new NOctNode(1);
-            var child1 = new NOctNode(2);
-            root.SetChild(NOctIndex.Zero, child1);
-            Assert.AreEqual(1, root.DepthOf(child1));
-
-            var child2 = new NOctNode(3);
-            child1.SetChild(NOctIndex.Zero, child2);
-            Assert.AreEqual(1, child1.DepthOf(child2));
-            Assert.AreEqual(2, root.DepthOf(child2));
-
-            var child3 = new NOctNode(1);
-            child2.SetChild(NOctIndex.Zero, child3);
-            Assert.AreEqual(1, child2.DepthOf(child3));
-            Assert.AreEqual(2, child1.DepthOf(child3));
-            Assert.AreEqual(3, root.DepthOf(child3));
+            var n0 = new NOctNode(1);
+            var n1 = new NOctNode(2);
+            var n2 = new NOctNode(3);
+            var n3 = new NOctNode(1);
+            n0.SetChild(NOctIndex.Zero, n1);
+            n1.SetChild(NOctIndex.Zero, n2);
+            n2.SetChild(NOctIndex.Zero, n3);
+            
+            Assert.AreEqual(0, n0.DepthOf(n0));
+            Assert.AreEqual(1, n0.DepthOf(n1));
+            Assert.AreEqual(2, n0.DepthOf(n2));
+            Assert.AreEqual(3, n0.DepthOf(n3));
+            Assert.AreEqual(1, n1.DepthOf(n2));
+            Assert.AreEqual(2, n1.DepthOf(n3));
+            Assert.AreEqual(1, n2.DepthOf(n3));
         }
 
         [Test]
@@ -132,21 +132,20 @@ namespace ShuHai.NOctree.Test
         [Test]
         public void IndexOfChild()
         {
-            var root = new NOctNode(1);
-            var child1 = new NOctNode(2);
-            root.SetChild(new NOctIndex(1, 0, 1), child1);
-            Assert.AreEqual(child1.Index, root.IndexOf(child1));
-            
-            // var child2 = new NOctNode(3);
-            // child1.SetChild(new NOctIndex(2, 1, 3), child2);
-            // Assert.AreEqual(new NOctIndex(2, 3, 5), child1.IndexOf(child2));
-            // Assert.AreEqual(new NOctIndex(4 * 1 + 2, 4 * 0 + 1, 4 * 1 + 3), root.IndexOf(child2));
-            //
-            // var child3 = new NOctNode(1);
-            // child2.SetChild(new NOctIndex(0, 1, 1), child3);
-            // Assert.AreEqual(new NOctIndex(0, 1, 1), child2.IndexOf(child3));
-            // Assert.AreEqual(new NOctIndex(), child1.IndexOf(child3));
-            // Assert.AreEqual(new NOctIndex(), root.IndexOf(child3));
+            var n0 = new NOctNode(1);
+            var n1 = new NOctNode(2);
+            var n2 = new NOctNode(3);
+            var n3 = new NOctNode();
+            n0.SetChild(1, 1, 0, n1);
+            n1.SetChild(2, 1, 1, n2);
+            n2.SetChild(5, 3, 2, n3);
+
+            Assert.AreEqual(n1.Index, n0.IndexOf(n1));
+            Assert.AreEqual(new NOctIndex(6, 5, 1), n0.IndexOf(n2));
+            Assert.AreEqual(new NOctIndex(53, 43, 10), n0.IndexOf(n3));
+            Assert.AreEqual(n2.Index, n1.IndexOf(n2));
+            Assert.AreEqual(new NOctIndex(21, 11, 10), n1.IndexOf(n3));
+            Assert.AreEqual(n3.Index, n2.IndexOf(n3));
         }
     }
 }
