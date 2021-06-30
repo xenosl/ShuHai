@@ -106,6 +106,8 @@ namespace ShuHai.NOctree
         {
             if (child == null)
                 throw new ArgumentNullException(nameof(child));
+            if (child == this)
+                throw new ArgumentException("Unable to evaluate rank of self.", nameof(child));
 
             var n = 0;
             var p = child.Parent;
@@ -128,6 +130,8 @@ namespace ShuHai.NOctree
         {
             if (child == null)
                 throw new ArgumentNullException(nameof(child));
+            if (child == this)
+                throw new ArgumentException("Unable to evaluate index of self.", nameof(child));
             if (IsLeaf)
                 throw new InvalidOperationException("Unable to evaluate child index from a leaf node.");
 
