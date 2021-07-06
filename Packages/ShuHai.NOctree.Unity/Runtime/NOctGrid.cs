@@ -25,7 +25,7 @@ namespace ShuHai.NOctree.Unity
                 throw new InvalidOperationException("A value greater than 0 for grow exponent expected.");
 
             var rootNode = new NOctNode(GrowN);
-            var rootCellSize = rootNode.SegmentCount * LeafCellSize;
+            var rootCellSize = rootNode.DimensionalChildCapacity * LeafCellSize;
             _rootCell = new NOctCell(GrowN, transform.position, rootCellSize);
         }
 

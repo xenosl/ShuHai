@@ -105,7 +105,7 @@ namespace ShuHai.NOctree.Unity
         /// </summary>
         private Vector3Int LocalToPositionIndex(int index0, int index1, int index2)
         {
-            var hc = _node.SegmentCount / 2;
+            var hc = _node.DimensionalChildCapacity / 2;
             return new Vector3Int(index0 - hc, index1 - hc, index2 - hc);
         }
 
@@ -114,7 +114,7 @@ namespace ShuHai.NOctree.Unity
         /// </summary>
         private (int index0, int index1, int index2) PositionToLocalIndex(Vector3Int centerIndex)
         {
-            var hc = _node.SegmentCount / 2;
+            var hc = _node.DimensionalChildCapacity / 2;
             return (centerIndex.x + hc, centerIndex.y + hc, centerIndex.z + hc);
         }
 
